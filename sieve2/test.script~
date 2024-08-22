@@ -1,0 +1,12 @@
+module register fix_mdst User_reco user_index
+path add_module main fix_mdst  User_reco user_index
+path add_condition main <:0:KILL
+
+initialize
+output open       test.index
+histogram define  test.hist
+
+process_event /gpfs/home/belle2/matrk/work/sieve/index_data/23.6.index 
+
+terminate
+# process_url "http://bweb3/mdst.php?bl=caseB&skm=HadronBJ&ex=21&rs=100&re=112&dv=zfserv&dt=Any"
