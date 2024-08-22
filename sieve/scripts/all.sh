@@ -1,12 +1,12 @@
 #!/bin/bash
 
-rm hbk_mc/* -f
-rm hbk_data/* -f
-rm log_mc/* -f
-rm log_data/* -f
-rm index_mc/* -f
-rm index_data/* -f
-rm -f fpda_pid.*
+rm ../hbk_mc/* -f
+rm ../hbk_data/* -f
+rm ../log_mc/* -f
+rm ../log_data/* -f
+rm ../index_mc/* -f
+rm ../index_data/* -f
+rm -f ../fpda_pid.*
 
 make
 
@@ -14,7 +14,7 @@ for i in  07 09  11 13 15 17 19 21 23 25 27  31 33 35 37 39 41 43 45 47 49 51 53
 
 do 
 
-echo script/exp${i}.sh  \>/dev/null "&" 
+echo exp${i}.sh  \>/dev/null "&" 
 
 done
 

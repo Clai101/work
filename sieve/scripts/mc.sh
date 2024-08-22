@@ -39,8 +39,8 @@ path add_module main fix_mdst  User_reco user_index
 path add_condition main <:0:KILL
 
 initialize
-output open       index_mc/${exp}.${run}.index
-histogram define  hbk_mc/${exp}.${run}.hist
+output open       ../index_mc/${exp}.${run}.index
+histogram define  ../hbk_mc/${exp}.${run}.hist
 
 process_url "http://bweb3/montecarlo.php?bl=caseB&ty=evtgen-charm&ex=${exp}&rs=${run}00&re=${run}99&dv=zfserv"
 
@@ -48,5 +48,5 @@ EOF
 
 echo terminate
 
-) | basf >  log_mc/${exp}.${run}.log 2>&1
+) | basf >  ../log_mc/${exp}.${run}.log 2>&1
 

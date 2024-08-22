@@ -2,9 +2,9 @@ import os
 
 directory = '.'
 
-old_substring = '-ql'
+old_substring = '.'
 
-new_substring = '--ql'
+new_substring = '.'
 
 for root, dirs, files in os.walk(directory):
     for filename in files:
