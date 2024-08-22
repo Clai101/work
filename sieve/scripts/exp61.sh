@@ -6,7 +6,7 @@ for ((j=0; j<10; j++)) do
 if [ `../check_statistics.sh  61 $i $j` -ne "0" ] 
 then
 
-bsub -q s ../data.sh 61 ${i} ${j} 
+bsub ql ../data.sh 61 ${i} ${j} 
 fi 
 done
 done

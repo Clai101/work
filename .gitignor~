@@ -1,7 +1,0 @@
-*.root
-*.hist
-*.log
-fpda_pid
-*.o
-*.d
-*.index
