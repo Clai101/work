@@ -8,9 +8,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "ecm rm2l dsm dm dsp dp ntr");
-  t2 = BASF_Histogram->ntuple ("wrong_charge",
-    "ecm");
+    "ecm en rm2l dsm dm dsp dp ntr chxc chlc mlc rm2n rm2nu q2");
 };
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
@@ -61,6 +59,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   /*************** Make particle lists ********************************/
 
   //Base particles
+
+  
 
   std::vector<Particle> p, ap, k_p, k_m, k0, pi_p, pi_m, pi0, gamma, gam, all, e_p, e_m, mu_m, mu_p, k_s, lam, alam;
 
@@ -201,7 +201,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   
   //X_c
 
-  std::vector<Particle> X_c, X_w;
+  std::vector<Particle> X_c, aX_c;
 
   combination(X_c, m_ptypeUPS4, D0, p);
   combination(aX_c, m_ptypeUPS4, aD0, ap);
@@ -226,6 +226,41 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
 for(int j=0; j<X_c.size(); ++j){
     Particle x_c=X_c[j];
+
+    Particle ach = x_c.child(0);
+    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
+    
+    if ((beam - (x_c.p())).m2() > 3 * 3) continue;
+    int ntr=0;
+    
+    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
+    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
+    
+    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
+      t1->column("dsm", ach.p().m());
+      t1->column("ch", abs(ach.pType().lund())-400);
+      t1->column("dsp", ach.p().mag());
+      t1->column("dm", ach.child(0).p().m());
+      t1->column("dp", ach.child(0).p().mag());
+    }
+    else{
+      t1->column("dm", ach.p().m());
+      t1->column("dp", ach.p().mag());
+    }
+    
+
+    t1->column("rm2l", (beam - (x_c.p())).m());    
+    t1->column("ecm", ecm);    
+    t1->column("ntr", ntr);
+    t1->column("chxc", chxc.channel().find("chanel")->second);
+
+    t1->dumpData();
+    *status = 1; 
+
+}
+
+for(int j=0; j<aX_c.size(); ++j){
+    Particle x_c=aX_c[j];
 
     Particle ach = x_c.child(0);
     UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
