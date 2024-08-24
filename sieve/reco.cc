@@ -132,10 +132,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0, m_ptypeD0, k_m, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_m, pi_p, pi_p, pi_m, 0.05);
-  combination(aD0, m_ptypeD0B, k_p, pi_m, pi_m, pi_p, 0.05);
-
-  combination(D0, m_ptypeD0, k_s, pi_p, pi_m, 0.05);
+  combination(D0, m_ptypeD0, k_m, pi_p, pi_p, pi_m, 0.05);, k_s, pi_p, pi_m, 0.05);
   combination(aD0, m_ptypeD0B, k_s, pi_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_m, pi0, pi_p, 0.05);
