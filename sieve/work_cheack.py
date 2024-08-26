@@ -1,5 +1,6 @@
 import os
-import re
+import time
+import wandb
 from collections import defaultdict
 
 def read_started_file(file_path):
@@ -61,28 +62,69 @@ def count_basf_statistics(file_path):
 
     return basf_count if not skip_file else 0
 
-def calculate_ratios(found_files):
-    """Вычисляет отношение количества BASF Execution Statistics к максимальному значению"""
+def calculate_file_ratios(found_files):
+    """Вычисляет отношение количества BASF Execution Statistics к максимальному значению для каждого файла"""
     max_counts = {'data': 10, 'mc': 100}
-    ratios = {}
+    file_ratios = {}
+    counts_by_type = defaultdict(int)
 
     for type_exp, files in found_files.items():
-        total_basf = sum(count_basf_statistics(file) for file in files)
         max_count = max_counts.get(type_exp, 1)
-        ratio = total_basf / max_count
-        ratios[type_exp] = ratio
+        for file in files:
+            basf_count = count_basf_statistics(file)
+            ratio = basf_count / max_count
+            file_ratios[file] = ratio
+            counts_by_type[type_exp] += basf_count
     
-    return ratios
+    return file_ratios, counts_by_type
 
-def main():
-    """Основная функция для выполнения всех шагов"""
+def calculate_type_percentage(lines, counts_by_type):
+    """Вычисляет процентное отношение количества файлов к максимальному значению по типу"""
+    max_counts = {'data': 10, 'mc': 100}
+    type_counts = defaultdict(int)
+    
+    for line in lines:
+        type_exp = line.split('_')[0]
+        type_counts[type_exp] += 1
+
+    type_percentages = {}
+    for type_exp, count in type_counts.items():
+        max_count = max_counts.get(type_exp, 1) * count
+        sum_count = counts_by_type.get(type_exp, 0)
+        type_percentages[type_exp] = (sum_count / max_count) * 100
+    
+    return type_percentages
+
+def log_metrics():
+    """Функция для выполнения всех шагов и логирования метрик"""
     lines = read_started_file('started.txt')
     file_paths = generate_file_paths(lines)
     found_files = find_files(file_paths)
-    ratios = calculate_ratios(found_files)
+    file_ratios, counts_by_type = calculate_file_ratios(found_files)
     
-    for type_exp, ratio in ratios.items():
-        print(f"Тип {type_exp}: отношение фактического количества к максимальному значению = {ratio:.2f}")
+    # Логирование отношения для каждого файла
+    for file_path, ratio in file_ratios.items():
+        wandb.log({f"ratio/{file_path}": ratio})
+
+    # Логирование процента по типам
+    type_percentages = calculate_type_percentage(lines, counts_by_type)
+    for type_exp, percentage in type_percentages.items():
+        wandb.log({f"percentage/{type_exp}": percentage})
+
+def main():
+    """Основная функция с циклом для выполнения задания каждую минуту"""
+    # Инициализация W&B
+    wandb.init(project="sieve", entity="clai101-hse-university")
+    
+    try:
+        while True:
+            log_metrics()
+            print("Завершена итерация логирования. Ожидание 1 минуту...")
+            time.sleep(60)  # Задержка в 1 минуту
+    except KeyboardInterrupt:
+        print("Логирование остановлено вручную.")
+    finally:
+        wandb.finish()  # Завершение сессии W&B
 
 if __name__ == "__main__":
     main()
