@@ -19,3 +19,4 @@ fpda_pid.*
 *.o
 *.d
 *.index
+wandb_venv/
