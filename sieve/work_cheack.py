@@ -101,25 +101,23 @@ def log_metrics():
     file_paths = generate_file_paths(lines)
     found_files = find_files(file_paths)
     file_ratios, counts_by_type = calculate_file_ratios(found_files)
+    type_percentages = calculate_type_percentage(lines, counts_by_type)
     
     # Подготовка данных для бар-графиков
-    # Проценты по типам
-    type_data = []
-    type_percentages = calculate_type_percentage(lines, counts_by_type)
-    for type_exp in ['mc', 'data']:
-        percentage = type_percentages.get(type_exp, 0)
-        type_data.append({"type": type_exp, "percentage": percentage})
-    
-    # Отношения для файлов
-    file_data = {}
-    for type_exp in ['mc', 'data']:
-        file_data[type_exp] = file_ratios.get(type_exp, [])
-    
+    data_mc = [[file["file"], file["ratio"]] for file in file_ratios['mc']]
+    data_dt = [[file["file"], file["ratio"]] for file in file_ratios['data']]
+    data_tp = [[type_exp, percentage] for type_exp, percentage in type_percentages.items()]
+
+    # Создание таблиц для бар-графиков
+    table_f1 = wandb.Table(data=data_dt, columns=["file", "ratio"])
+    table_f2 = wandb.Table(data=data_mc, columns=["file", "ratio"])
+    table_tp = wandb.Table(data=data_tp, columns=["type", "percentage"])
+
     # Логирование бар-графиков
     wandb.log({
-        "type_percentages": wandb.plot.bar(wandb.Table(data=type_data, columns=["type", "percentage"]), "type", "percentage"),
-        "file_ratios_mc": wandb.plot.bar(wandb.Table(data=file_data['mc'], columns=["file", "ratio"]), "file", "ratio"),
-        "file_ratios_data": wandb.plot.bar(wandb.Table(data=file_data['data'], columns=["file", "ratio"]), "file", "ratio")
+        "type_percentages": wandb.plot.bar(table_tp, "type", "percentage", title="Percentages of Types"),
+        "file_ratios_data": wandb.plot.bar(table_f1, "file", "ratio", title="File Ratios (Data)"),
+        "file_ratios_mc": wandb.plot.bar(table_f2, "file", "ratio", title="File Ratios (MC)")
     })
 
 def main():
