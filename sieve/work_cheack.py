@@ -47,7 +47,7 @@ def find_files(file_paths):
                 
     return found_files
 
-def count_basf_statistics(file_path):
+def count_basf_statistics(file_path, maximum):
     """Подсчитывает количество строк с BASF Execution Statistics и проверяет наличие строки об ошибке чтения файла"""
     basf_count = 0
     skip_file = False
@@ -57,7 +57,7 @@ def count_basf_statistics(file_path):
             if 'BASF Execution Statistics' in line:
                 basf_count += 1
             elif 'This file will not be readable with versions' in line:
-                skip_file = True
+                basf_count = maximum
                 break
 
     return basf_count if not skip_file else 0
@@ -71,7 +71,7 @@ def calculate_file_ratios(found_files):
     for type_exp, files in found_files.items():
         max_count = max_counts.get(type_exp, 1)
         for file in files:
-            basf_count = count_basf_statistics(file)
+            basf_count = count_basf_statistics(file, max_counts[type_exp])
             ratio = basf_count / max_count
             file_ratios[file] = ratio
             counts_by_type[type_exp] += basf_count
