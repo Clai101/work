@@ -19,6 +19,9 @@ fi
 #####################################
 source /sw/belle/local/etc/bashrc_general
 
+echo "mc_${1}_${2}" >> started.txt
+
+
 export USE_GRAND_REPROCESS_DATA=1
 export BASF_USER_IF=basfsh.so
 export BASF_USER_INIT=user_init.so
