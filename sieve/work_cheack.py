@@ -2,7 +2,6 @@ import os
 import time
 import wandb
 from collections import defaultdict
-import plotly.express as px
 
 def read_started_file(file_path):
     """Читает строки из файла started.txt"""
@@ -41,8 +40,7 @@ def find_files(file_paths):
     for type_exp, paths in file_paths.items():
         for file_path in paths:
             if os.path.isfile(file_path):
-                found_files[type_exp].append(file_path)
-                
+                found_files[type_exp].append(file_path)  
     return found_files
 
 def count_basf_statistics(file_path):
@@ -102,20 +100,20 @@ def log_metrics():
     type_percentages = calculate_type_percentage(lines, counts_by_type)
     
     # Подготовка данных для бар-графиков
-    data_mc = [{"file": file["file"], "ratio": file["ratio"]} for file in file_ratios['mc']]
-    data_dt = [{"file": file["file"], "ratio": file["ratio"]} for file in file_ratios['data']]
-    data_tp = [{"type": type_exp, "percentage": percentage} for type_exp, percentage in type_percentages.items()]
+    data_mc = [[file["file"], file["ratio"]] for file in file_ratios['mc']]
+    data_dt = [[file["file"], file["ratio"]] for file in file_ratios['data']]
+    data_tp = [[type_exp, percentage] for type_exp, percentage in type_percentages.items()]
 
-    # Создание графиков с использованием Plotly
-    fig_tp = px.bar(data_tp, x="type", y="percentage", title="Percentages of Types", range_y=[0, 100])
-    fig_f1 = px.bar(data_dt, x="file", y="ratio", title="File Ratios (Data)", range_y=[0, 1])
-    fig_f2 = px.bar(data_mc, x="file", y="ratio", title="File Ratios (MC)", range_y=[0, 1])
+    # Создание таблиц для бар-графиков
+    table_f1 = wandb.Table(data=data_dt, columns=["file", "ratio"])
+    table_f2 = wandb.Table(data=data_mc, columns=["file", "ratio"])
+    table_tp = wandb.Table(data=data_tp, columns=["type", "percentage"])
 
-    # Логирование графиков в W&B
+    # Логирование бар-графиков
     wandb.log({
-        "type_percentages": fig_tp,
-        "file_ratios_data": fig_f1,
-        "file_ratios_mc": fig_f2
+        "type_percentages": wandb.plot.bar(table_tp, "type", "percentage", title="Percentages of Types"),
+        "file_ratios_data": wandb.plot.bar(table_f1, "file", "ratio", title="File Ratios (Data)"),
+        "file_ratios_mc": wandb.plot.bar(table_f2, "file", "ratio", title="File Ratios (MC)")
     })
 
 def main():
