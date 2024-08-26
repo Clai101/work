@@ -47,7 +47,7 @@ def find_files(file_paths):
                 
     return found_files
 
-def count_basf_statistics(file_path, maximum):
+def count_basf_statistics(file_path):
     """Подсчитывает количество строк с BASF Execution Statistics и проверяет наличие строки об ошибке чтения файла"""
     basf_count = 0
     skip_file = False
@@ -57,7 +57,7 @@ def count_basf_statistics(file_path, maximum):
             if 'BASF Execution Statistics' in line:
                 basf_count += 1
             elif 'This file will not be readable with versions' in line:
-                basf_count = maximum
+                skip_file = True
                 break
 
     return basf_count if not skip_file else 0
@@ -65,15 +65,15 @@ def count_basf_statistics(file_path, maximum):
 def calculate_file_ratios(found_files):
     """Вычисляет отношение количества BASF Execution Statistics к максимальному значению для каждого файла"""
     max_counts = {'data': 10, 'mc': 100}
-    file_ratios = {}
+    file_ratios = defaultdict(list)
     counts_by_type = defaultdict(int)
 
     for type_exp, files in found_files.items():
         max_count = max_counts.get(type_exp, 1)
         for file in files:
-            basf_count = count_basf_statistics(file, max_counts[type_exp])
+            basf_count = count_basf_statistics(file)
             ratio = basf_count / max_count
-            file_ratios[file] = ratio
+            file_ratios[type_exp].append({"file": file, "ratio": ratio})
             counts_by_type[type_exp] += basf_count
     
     return file_ratios, counts_by_type
@@ -102,19 +102,30 @@ def log_metrics():
     found_files = find_files(file_paths)
     file_ratios, counts_by_type = calculate_file_ratios(found_files)
     
-    # Логирование отношения для каждого файла
-    for file_path, ratio in file_ratios.items():
-        wandb.log({f"ratio/{file_path}": ratio})
-
-    # Логирование процента по типам
+    # Подготовка данных для бар-графиков
+    # Проценты по типам
+    type_data = []
     type_percentages = calculate_type_percentage(lines, counts_by_type)
-    for type_exp, percentage in type_percentages.items():
-        wandb.log({f"percentage/{type_exp}": percentage})
+    for type_exp in ['mc', 'data']:
+        percentage = type_percentages.get(type_exp, 0)
+        type_data.append({"type": type_exp, "percentage": percentage})
+    
+    # Отношения для файлов
+    file_data = {}
+    for type_exp in ['mc', 'data']:
+        file_data[type_exp] = file_ratios.get(type_exp, [])
+    
+    # Логирование бар-графиков
+    wandb.log({
+        "type_percentages": wandb.plot.bar(wandb.Table(data=type_data, columns=["type", "percentage"]), "type", "percentage"),
+        "file_ratios_mc": wandb.plot.bar(wandb.Table(data=file_data['mc'], columns=["file", "ratio"]), "file", "ratio"),
+        "file_ratios_data": wandb.plot.bar(wandb.Table(data=file_data['data'], columns=["file", "ratio"]), "file", "ratio")
+    })
 
 def main():
     """Основная функция с циклом для выполнения задания каждую минуту"""
-    # Инициализация W&B
-    wandb.init(project="sieve", entity="clai101-hse-university")
+    # Инициализация W&B с перезапуском графиков
+    wandb.init(project="sieve", entity="clai101-hse-university", reinit=True)
     
     try:
         while True:
