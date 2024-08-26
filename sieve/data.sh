@@ -28,7 +28,6 @@ fi
 #####################################
 source /sw/belle/local/etc/bashrc_general
 
-echo "data_${1}_${2}_${3}" >> started.txt
 
 export USE_GRAND_REPROCESS_DATA=1
 export BASF_USER_IF=basfsh.so
