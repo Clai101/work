@@ -1,8 +1,6 @@
-import wandb
 import os
 import re
 from collections import defaultdict
-import time
 
 def read_started_file(file_path):
     """Читает строки из файла started.txt"""
@@ -48,67 +46,43 @@ def find_files(file_paths):
                 
     return found_files
 
-def extract_run_number(file_paths):
-    """Извлекает значения RunNo и Total Runs из логов и возвращает результаты"""
-    pattern_dedx = re.compile(r"INFO\s+:\s+dEdxCalib: ExpNo\s*=\s*\d+\s+RunNo\s*=\s*(\d+)\s+Gain\s*=\s*\d+\.\d+")
-    pattern_pntdb = re.compile(r"INFO\s+:\s+PntDB:TPntDB::Get> exp\s*=\s*\d+,\s*run\s*=\s*(\d+),\s*version\s*=\s*1")
-    stats_pattern = re.compile(r"^-{2,}\s+BASF Execution Statistics\s+-{2,}")
+def count_basf_statistics(file_path):
+    """Подсчитывает количество строк с BASF Execution Statistics и проверяет наличие строки об ошибке чтения файла"""
+    basf_count = 0
+    skip_file = False
 
-    results = defaultdict(list)
-    type_counts = defaultdict(int)
+    with open(file_path, 'r') as file:
+        for line in file:
+            if 'BASF Execution Statistics' in line:
+                basf_count += 1
+            elif 'This file will not be readable with versions' in line:
+                skip_file = True
+                break
 
-    for type_exp, paths in file_paths.items():
-        for file_path in paths:
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
+    return basf_count if not skip_file else 0
 
-            found_stats_section = False
-            last_match_dedx = None
-            last_match_pntdb = None
+def calculate_ratios(found_files):
+    """Вычисляет отношение количества BASF Execution Statistics к максимальному значению"""
+    max_counts = {'data': 10, 'mc': 100}
+    ratios = {}
 
-            for line in lines:
-                if stats_pattern.search(line):
-                    found_stats_section = True
-
-                if found_stats_section:
-                    match_dedx = pattern_dedx.search(line)
-                    if match_dedx:
-                        last_match_dedx = match_dedx
-
-            for line in lines:
-                match_pntdb = pattern_pntdb.search(line)
-                if match_pntdb:
-                    last_match_pntdb = match_pntdb
-
-            run_no_dedx = last_match_dedx.group(1) if last_match_dedx else "0"
-            total_runs = last_match_pntdb.group(1) if last_match_pntdb else "Не найдено"
-
-            type_counts[type_exp] += 1
-
-            results[type_exp].append({
-                'file': file_path,
-                'run_no_dedx': run_no_dedx,
-                'total_runs': total_runs
-            })
-
-    return results, type_counts
-
-def print_results(results):
-    """Выводит результаты проверки"""
-    print("\nРезультаты:")
-    for type_exp, result_list in results.items():
-        print(f"---------------------------{type_exp}---------------------------")
-        for result in result_list:
-            print(f"Тип: {type_exp}, Файл: {result['file']}, Run No (dEdxCalib): {result['run_no_dedx']}, Total Runs (PntDB): {result['total_runs']}")
-
+    for type_exp, files in found_files.items():
+        total_basf = sum(count_basf_statistics(file) for file in files)
+        max_count = max_counts.get(type_exp, 1)
+        ratio = total_basf / max_count
+        ratios[type_exp] = ratio
+    
+    return ratios
 
 def main():
     """Основная функция для выполнения всех шагов"""
     lines = read_started_file('started.txt')
     file_paths = generate_file_paths(lines)
     found_files = find_files(file_paths)
-    results, type_counts = extract_run_number(found_files)
-    print_results(results)
+    ratios = calculate_ratios(found_files)
+    
+    for type_exp, ratio in ratios.items():
+        print(f"Тип {type_exp}: отношение фактического количества к максимальному значению = {ratio:.2f}")
 
 if __name__ == "__main__":
     main()
