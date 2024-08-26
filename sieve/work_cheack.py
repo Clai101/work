@@ -1,6 +1,7 @@
 import wandb
 import os
 import re
+from collections import defaultdict
 
 def read_started_file(file_path):
     """Читает строки из файла started.txt"""
@@ -48,6 +49,7 @@ def extract_run_number(file_paths):
     stats_pattern = re.compile(r"^-{2,}\s+BASF Execution Statistics\s+-{2,}")
 
     results = []
+    type_counts = defaultdict(int)
 
     for file_path in file_paths:
         with open(file_path, 'r') as file:
@@ -75,13 +77,16 @@ def extract_run_number(file_paths):
         run_no_dedx = last_match_dedx.group(1) if last_match_dedx else "0"
         total_runs = last_match_pntdb.group(1) if last_match_pntdb else "Не найдено"
 
+        type_exp = os.path.basename(os.path.dirname(file_path)).split('_')[1]
+        type_counts[type_exp] += 1
+
         results.append({
             'file': file_path,
             'run_no_dedx': run_no_dedx,
             'total_runs': total_runs
         })
 
-    return results
+    return results, type_counts
 
 def print_results(results):
     """Выводит результаты проверки"""
@@ -89,13 +94,27 @@ def print_results(results):
     for result in results:
         print(f"Файл: {result['file']}, Run No (dEdxCalib): {result['run_no_dedx']}, Total Runs (PntDB): {result['total_runs']}")
 
+def log_to_wandb(type_counts):
+    """Логирует данные в wandb"""
+    wandb.init(project='sieve', entity='clai101')
+    wandb.log({
+        'File Counts by Type': wandb.plot.bar(
+            x=list(type_counts.keys()),
+            y=list(type_counts.values()),
+            xlabel='Type',
+            ylabel='Count',
+            title='Started'
+        )
+    })
+
 def main():
     """Основная функция для выполнения всех шагов"""
     lines = read_started_file('started.txt')
     file_paths = generate_file_paths(lines)
     found_files = find_files(file_paths)
-    results = extract_run_number(found_files)
+    results, type_counts = extract_run_number(found_files)
     print_results(results)
+    log_to_wandb(type_counts)
 
 if __name__ == "__main__":
     main()
