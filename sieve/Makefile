@@ -7,12 +7,12 @@ cc TRAKCStrack.cc TRAKHybrid.cc TRAKTrack.cc CDCClustFinder.cc TRAK.cc TRAKClust
 # If there are several .cc files to be compiled you must point them above                                                                                                                                                                     
 
 %.o: %.cc %.h
-        gcc -c $(COMPILEFLAGS) $(DEBUG) -std=c++11 -MMD $(INC) -o $@ $<
+	gcc -c $(COMPILEFLAGS) $(DEBUG) -std=c++11 -MMD $(INC) -o $@ $<
 
 User_reco.so: reco.o userinfo.o myutils.o utility.o psi.o
-        gcc $(LINKFLAGS) $(DEBUG)    $^ -o $@
+	gcc $(LINKFLAGS) $(DEBUG)    $^ -o $@
 clean:
-        -rm *.o *.so *.d
+	-rm *.o *.so *.d
 
 
 -include $(DEP)
