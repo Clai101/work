@@ -8,7 +8,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "ecm en rm2l dsm dm dsp dp ntr chxc chlc mlc rm2n rm2nu q2");
+    "ecm rm2l dsm dm dsp dp ntr chxc");
 };
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
@@ -288,7 +288,6 @@ for(int j=0; j<aX_c.size(); ++j){
 
     t1->dumpData();
     *status = 1; 
-
 }
 
 if (*status==1) {nwritt++;
