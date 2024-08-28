@@ -94,6 +94,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   
   //fill vectors lam, alam, p, ap
   makeProton(p, ap, 1);
+  
+  if(p.size() + ap.size()  < 0.5) return;
 
   //filter vectors p, ap
   withProtonIdCut(p, ap, 0.6);
@@ -244,7 +246,6 @@ for(int j=0; j<X_c.size(); ++j){
       t1->column("dm", ach.p().m());
       t1->column("dp", ach.p().mag());
     }
-    
 
     t1->column("rm2l", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    
@@ -268,9 +269,8 @@ for(int j=0; j<aX_c.size(); ++j){
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
     
-    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
+    if(chxc.channel().find("chanel")->second >= 3){
       t1->column("dsm", ach.p().m());
-      t1->column("ch", abs(ach.pType().lund())-400);
       t1->column("dsp", ach.p().mag());
       t1->column("dm", ach.child(0).p().m());
       t1->column("dp", ach.child(0).p().mag());
