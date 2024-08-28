@@ -64,8 +64,12 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   std::vector<Particle> p, ap, k_p, k_m, k0, pi_p, pi_m, pi0, gamma, gam, all, e_p, e_m, mu_m, mu_p, k_s, lam, alam;
 
+  //fill vectors k_s, k_p, k_m, pi_p, pi_m
   makeKPi(k_p, k_m, pi_p, pi_m, 1);
+  makeKs(k_s);
 
+  if(k_m.size() + k_p.size() +  k_s.size() < 0.5) return;
+  
   //filter vectors k_s, k_p, k_m, pi_p, pi_m 
   withDrDzCut(pi_p, 1., 2.);
   withDrDzCut(pi_m, 1., 2.);
@@ -74,10 +78,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   withDrDzCut(k_p, 1., 2.);
   withKaonIdCut(k_p, k_m, 0.6);
 
-  //fill vectors k_s, k_p, k_m, pi_p, pi_m
-  makeKs(k_s);
-
-  if(k_m.size() + k_p.size() +  k_s.size() < 0.5) return;
 
   for(std::vector<Particle>::iterator l = k_s.begin(); l!=k_s.end(); ++l) {
     HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
@@ -94,7 +94,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   
   //fill vectors lam, alam, p, ap
   makeProton(p, ap, 1);
-  
+
   if(p.size() + ap.size()  < 0.5) return;
 
   //filter vectors p, ap

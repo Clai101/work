@@ -3,7 +3,6 @@
 rm hbk_mc/*.hist -f &
 rm log_mc/*.log -f &
 rm index_mc/*.index -f &
-rm -f fpda_pid.* &
 
 wait
 

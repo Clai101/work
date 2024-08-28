@@ -64,17 +64,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   std::vector<Particle> p, ap, k_p, k_m, k0, pi_p, pi_m, pi0, gamma, gam, all, e_p, e_m, mu_m, mu_p, k_s, lam, alam;
 
-  makeKPi(k_p, k_m, pi_p, pi_m, 1);
-
-  //filter vectors k_s, k_p, k_m, pi_p, pi_m 
-  withDrDzCut(pi_p, 1., 2.);
-  withDrDzCut(pi_m, 1., 2.);
-
-  if (pi_p.size() + pi_m.size() > 10.5) return;
-
-  withDrDzCut(k_m, 1., 2.);
-  withDrDzCut(k_p, 1., 2.);
-  withKaonIdCut(k_p, k_m, 0.6);
 
   //fill vectors lam, alam, p, ap
   makeLambda(lam,alam);
@@ -82,6 +71,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   //filter vectors p, ap
   withProtonIdCut(p, ap, 0.6);
+
+  if(p.size() + lam.size() < 0.5) return;
+  if(ap.size() + alam.size() < 0.5) return;
+
   withDrDzCut(p, 1., 2.);
   withDrDzCut(ap, 1., 2.);
 
@@ -99,7 +92,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       lam.erase(l); --l;
     }
   }
-
 
   for(std::vector<Particle>::iterator l = alam.begin(); l!=alam.end(); ++l) {
     HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
@@ -122,6 +114,18 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   //fill vectors k_s, k_p, k_m, pi_p, pi_m
   makeKs(k_s);
+  makeKPi(k_p, k_m, pi_p, pi_m, 1);
+
+  if (k_s.size() + k_m.size() + k_p.size() + lam.size() + alam.size() < 1.5) return;
+
+  //filter vectors k_s, k_p, k_m, pi_p, pi_m 
+  withDrDzCut(pi_p, 1., 2.);
+  withDrDzCut(pi_m, 1., 2.);
+
+  withDrDzCut(k_m, 1., 2.);
+  withDrDzCut(k_p, 1., 2.);
+  withKaonIdCut(k_p, k_m, 0.6);
+  
 
   for(std::vector<Particle>::iterator l = k_s.begin(); l!=k_s.end(); ++l) {
     HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
@@ -134,7 +138,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     }
   }
 
-  //Cheack charge consrvarion law and mesons in case
+  //Cheack charm consrvarion law and mesons in case
   if (k_s.size() + k_m.size() + k_p.size() + lam.size() + alam.size() < 1.5) return;
 
   //fill vectors e_p, e_m, mu_p, mu_m
@@ -157,6 +161,44 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   withEminCutPi0(pi0, 0.05);
 
   //Undetected particles
+
+  std::vector<Particle> lamc_p, lamc_m;
+
+  combination(lamc_p, m_ptypeLAMC, lam, pi_p, 0.05);
+  combination(lamc_m, m_ptypeLAMC, alam, pi_m, 0.05);
+  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}});
+  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}});  
+
+  combination(lamc_p, m_ptypeLAMC, lam, pi_p, pi0, 0.05);
+  combination(lamc_m, m_ptypeLAMC, alam, pi_m, pi0, 0.05);
+  setUserInfo(lamc_m,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", 1}});
+  setUserInfo(lamc_p,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", -1}});
+
+
+  combination(lamc_m, m_ptypeLAMC, ap, k_p, pi_m, 0.05);
+  combination(lamc_p, m_ptypeLAMC, p, k_m, pi_p, 0.05);
+  setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}});
+  setUserInfo(lamc_p, {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}});
+
+  combination(lamc_p, m_ptypeLAMC, lam, k_p, k_s, 0.05);
+  combination(lamc_m, m_ptypeLAMC, alam, k_m, k_s, 0.05);
+  setUserInfo(lamc_m, {{"chanel", 6}, {"charg", -1}, {"baryon_num", -1}});
+  setUserInfo(lamc_p, {{"chanel", 6}, {"charg", 1}, {"baryon_num", 1}});
+
+  combination(lamc_p, m_ptypeLAMC, lam, e_p);
+  combination(lamc_m, m_ptypeLAMC, alam, e_m);
+  setUserInfo(lamc_p,  {{"chanel", 1}, {"charg", 1}, {"baryon_num", -1}});
+  setUserInfo(lamc_m,  {{"chanel", 1}, {"charg", -1}, {"baryon_num", 1}});
+
+  combination(lamc_p, m_ptypeLAMC, lam, mu_p);
+  combination(lamc_m, m_ptypeLAMC, alam, mu_m);
+  setUserInfo(lamc_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}});
+  setUserInfo(lamc_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}});
+
+  if (lamc_m.size()+lamc_p.size()<0.5) return;
+
+  //Hadron cons. law
+  if(((p.size() < 0.5) and (lamc_m.size() < 0.5)) or ((ap.size() < 0.5) and (lamc_p.size() < 0.5))) return;
 
   //D_pm
 
@@ -188,22 +230,26 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   //D0
 
-  std::vector<Particle> D0, aD0;
+  std::vector<Particle> D0, aD0, D0_to_ds, aD0_to_ds;
 
   combination(D0, m_ptypeD0, k_m, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_m, pi_p, pi_p, pi_m, 0.05);
-  combination(aD0, m_ptypeD0B, k_p, pi_m, pi_m, pi_p, 0.05);
+  combination(D0, m_ptypeD0, k_s, pi_p, pi_m, 0.05);
+  combination(aD0, m_ptypeD0B, k_s, pi_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_m, pi0, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi0, pi_m, 0.05);
 
+  combination(D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
+  combination(aD0, m_ptypeD0B, k_s, pi_m, pi_p, pi0, 0.05);
+
+
+  combination(D0_to_ds, m_ptypeD0, pi0, pi0, k_m, pi_p, 0.05);
+  combination(aD0_to_ds, m_ptypeD0B, pi0, pi0, k_p, pi_m, 0.05);
+
   combination(D0, m_ptypeD0, k_m, k_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, k_m, 0.05);
-
-  combination(D0, m_ptypeD0, k_s, pi_p, pi_m, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_s, pi0, 0.05);
   combination(aD0, m_ptypeD0B, k_s, pi0, 0.05);
@@ -222,6 +268,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   combination(D_p_st, m_ptypeDstarP, D0, pi_p, 0.03);
   combination(D_m_st, m_ptypeDstarM, aD0, pi_m, 0.03);
+
+  combination(D_p_st, m_ptypeDstarP, D0_to_ds, pi_p, 0.03);
+  combination(D_m_st, m_ptypeDstarM, aD0_to_ds, pi_m, 0.03);
 
   combination(D_p_st, m_ptypeDstarP, D_p, pi0, 0.03);
   combination(D_m_st, m_ptypeDstarM, D_m, pi0, 0.03);
@@ -274,114 +323,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(aX_c, m_ptypeUPS4, D_m_st, ap, pi_p);
   setUserInfo(X_c,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", 1}});
   setUserInfo(aX_c,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", -1}});
-
-
- for(int j=0; j<X_c.size(); ++j){
-    Particle x_c=X_c[j];
-
-    Particle ach = x_c.child(0);
-    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
-    
-    if ((beam - (x_c.p())).m2() > 3.5 * 3.5) continue;
-    int ntr=0;
-    
-    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
-    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
-    
-    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
-      t1->column("dsm", ach.p().m());
-      t1->column("ch", abs(ach.pType().lund())-400);
-      t1->column("dsp", ach.p().mag());
-      t1->column("dm", ach.child(0).p().m());
-      t1->column("dp", ach.child(0).p().mag());
-    }
-    else{
-      t1->column("dm", ach.p().m());
-      t1->column("dp", ach.p().mag());
-    }
-    
-
-    t1->column("rm2l", (beam - (x_c.p())).m());    
-    t1->column("ecm", ecm);    
-    t1->column("ntr", ntr);
-    t1->column("chxc", chxc.channel().find("chanel")->second);
-
-    t1->dumpData();
-
-
-    if(ntr >= 4) continue;
-}
-
- for(int j=0; j<aX_c.size(); ++j){
-    Particle x_c=aX_c[j];
-
-    Particle ach = x_c.child(0);
-    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
-    
-    if ((beam - (x_c.p())).m2() > 3.5 * 3.5) continue;
-    int ntr=0;
-    
-    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
-    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
-
-    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
-      t1->column("dsm", ach.p().m());
-      t1->column("ch", abs(ach.pType().lund())-400);
-      t1->column("dsp", ach.p().mag());
-      t1->column("dm", ach.child(0).p().m());
-      t1->column("dp", ach.child(0).p().mag());
-    }
-    else{
-      t1->column("dm", ach.p().m());
-      t1->column("dp", ach.p().mag());
-    }    
-    
-    t1->column("rm2l", (beam - (x_c.p())).m());    
-    t1->column("ecm", ecm);    
-    t1->column("ntr", ntr);
-    t1->column("chxc", chxc.channel().find("chanel")->second);
-
-    t1->dumpData();
-
-
-    if(ntr >= 4) continue;
-}
-
-
-  std::vector<Particle> lamc_p, lamc_m;
-
-  combination(lamc_m, m_ptypeLAMC, alam, pi_m, 0.05);
-  combination(lamc_p, m_ptypeLAMC, lam, pi_p, 0.05);
-  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}});
-  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}});  
-
-  combination(lamc_m, m_ptypeLAMC, alam, pi_m, pi0, 0.05);
-  combination(lamc_p, m_ptypeLAMC, lam, pi_p, pi0, 0.05);
-  setUserInfo(lamc_m,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", 1}});
-  setUserInfo(lamc_p,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", -1}});
-
-
-  combination(lamc_m, m_ptypeLAMC, ap, k_p, pi_m, 0.05);
-  combination(lamc_p, m_ptypeLAMC, p, k_m, pi_p, 0.05);
-  setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}});
-  setUserInfo(lamc_p, {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}});
-
-  combination(lamc_m, m_ptypeLAMC, alam, k_m, k_s, 0.05);
-  combination(lamc_p, m_ptypeLAMC, lam, k_p, k_s, 0.05);
-  setUserInfo(lamc_m, {{"chanel", 6}, {"charg", -1}, {"baryon_num", -1}});
-  setUserInfo(lamc_p, {{"chanel", 6}, {"charg", 1}, {"baryon_num", 1}});
-
-  combination(lamc_p, m_ptypeLAMC, lam, e_p);
-  combination(lamc_m, m_ptypeLAMC, alam, e_m);
-  setUserInfo(lamc_p,  {{"chanel", 1}, {"charg", 1}, {"baryon_num", -1}});
-  setUserInfo(lamc_m,  {{"chanel", 1}, {"charg", -1}, {"baryon_num", 1}});
-
-  combination(lamc_p, m_ptypeLAMC, lam, mu_p);
-  combination(lamc_m, m_ptypeLAMC, alam, mu_m);
-  setUserInfo(lamc_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}});
-  setUserInfo(lamc_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}});
-
-  if (lamc_m.size()+lamc_p.size()<0.5) return;
 
   std::vector<Particle> ups;
 
