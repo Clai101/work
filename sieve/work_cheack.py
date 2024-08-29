@@ -41,6 +41,8 @@ def find_files(file_paths):
         for file_path in paths:
             if os.path.isfile(file_path):
                 found_files[type_exp].append(file_path)  
+            else:
+                print(file_path)
     return found_files
 
 def count_basf_statistics(file_path):
@@ -99,37 +101,9 @@ def log_metrics():
     file_ratios, counts_by_type = calculate_file_ratios(found_files)
     type_percentages = calculate_type_percentage(lines, counts_by_type)
     
-    # Подготовка данных для бар-графиков
-    data_mc = [[file["file"], file["ratio"]] for file in file_ratios['mc']]
-    data_dt = [[file["file"], file["ratio"]] for file in file_ratios['data']]
-    data_tp = [[type_exp, percentage] for type_exp, percentage in type_percentages.items()]
-
-    # Создание таблиц для бар-графиков
-    table_f1 = wandb.Table(data=data_dt, columns=["file", "ratio"])
-    table_f2 = wandb.Table(data=data_mc, columns=["file", "ratio"])
-    table_tp = wandb.Table(data=data_tp, columns=["type", "percentage"])
-
-    # Логирование бар-графиков
-    wandb.log({
-        "type_percentages": wandb.plot.bar(table_tp, "type", "percentage", title="Percentages of Types"),
-        "file_ratios_data": wandb.plot.bar(table_f1, "file", "ratio", title="File Ratios (Data)"),
-        "file_ratios_mc": wandb.plot.bar(table_f2, "file", "ratio", title="File Ratios (MC)")
-    })
-
 def main():
     """Основная функция с циклом для выполнения задания каждую минуту"""
     # Инициализация W&B с перезапуском графиков
-    wandb.init(project="sieve", entity="clai101-hse-university", reinit=True)
-    
-    try:
-        while True:
-            log_metrics()
-            print("Завершена итерация логирования. Ожидание 1 минуту...")
-            time.sleep(60)  # Задержка в 1 минуту
-    except KeyboardInterrupt:
-        print("Логирование остановлено вручную.")
-    finally:
-        wandb.finish()  # Завершение сессии W&B
-
+    log_metrics ()
 if __name__ == "__main__":
     main()
