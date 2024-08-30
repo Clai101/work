@@ -48,7 +48,7 @@ EOF
 
 for file in ${filelist}
 do
-    echo "process_event ${file}" 
+    echo "process_event ${file} " 
 done
 
 echo "terminate"

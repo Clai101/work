@@ -69,7 +69,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   makeKs(k_s);
 
   if(k_m.size() + k_p.size() +  k_s.size() < 0.5) return;
-  
+
   //filter vectors k_s, k_p, k_m, pi_p, pi_m 
   withDrDzCut(pi_p, 1., 2.);
   withDrDzCut(pi_m, 1., 2.);
@@ -144,7 +144,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(aD0, m_ptypeD0B, k_s, pi_m, pi_p, pi0, 0.05);
 
 
-  combination(D0_to_ds, m_ptypeD0, pi0, pi0, k_m, pi_p, 0.05);
+  combinagittion(D0_to_ds, m_ptypeD0, pi0, pi0, k_m, pi_p, 0.05);
   combination(aD0_to_ds, m_ptypeD0B, pi0, pi0, k_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_m, k_p, 0.05);
@@ -200,27 +200,23 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   
   //X_c
 
-  std::vector<Particle> X_c, aX_c;
+  std::vector<Particle> X_c;
 
   combination(X_c, m_ptypeUPS4, D0, p);
-  combination(aX_c, m_ptypeUPS4, aD0, ap);
+  combination(X_c, m_ptypeUPS4, aD0, ap);
   setUserInfo(X_c, {{"chanel", 1}, {"charg", 1}, {"baryon_num", 1}});
-  setUserInfo(aX_c, {{"chanel", 1}, {"charg", -1},  {"baryon_num", -1}});
 
   combination(X_c, m_ptypeUPS4, D_p, p, pi_m);
-  combination(aX_c, m_ptypeUPS4, D_m, ap, pi_p);
+  combination(X_c, m_ptypeUPS4, D_m, ap, pi_p);
   setUserInfo(X_c, {{"chanel", 2}, {"charg", 1}, {"baryon_num", 1}});
-  setUserInfo(aX_c, {{"chanel", 2}, {"charg", -1},  {"baryon_num", -1}});
 
   combination(X_c, m_ptypeUPS4, D0_st, p);
-  combination(aX_c, m_ptypeUPS4, aD0_st, ap);
+  combination(X_c, m_ptypeUPS4, aD0_st, ap);
   setUserInfo(X_c,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", 1}});
-  setUserInfo(aX_c,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", -1}});
 
   combination(X_c, m_ptypeUPS4, D_p_st, p, pi_m);
-  combination(aX_c, m_ptypeUPS4, D_m_st, ap, pi_p);
+  combination(X_c, m_ptypeUPS4, D_m_st, ap, pi_p);
   setUserInfo(X_c,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", 1}});
-  setUserInfo(aX_c,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", -1}});
 
 
 for(int j=0; j<X_c.size(); ++j){
@@ -257,38 +253,6 @@ for(int j=0; j<X_c.size(); ++j){
 
 }
 
-for(int j=0; j<aX_c.size(); ++j){
-    Particle x_c=aX_c[j];
-
-    Particle ach = x_c.child(0);
-    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
-    
-    if ((beam - (x_c.p())).m2() > 3 * 3) continue;
-    int ntr=0;
-    
-    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
-    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
-    
-    if(chxc.channel().find("chanel")->second >= 3){
-      t1->column("dsm", ach.p().m());
-      t1->column("dsp", ach.p().mag());
-      t1->column("dm", ach.child(0).p().m());
-      t1->column("dp", ach.child(0).p().mag());
-    }
-    else{
-      t1->column("dm", ach.p().m());
-      t1->column("dp", ach.p().mag());
-    }
-    
-
-    t1->column("rm2l", (beam - (x_c.p())).m());    
-    t1->column("ecm", ecm);    
-    t1->column("ntr", ntr);
-    t1->column("chxc", chxc.channel().find("chanel")->second);
-
-    t1->dumpData();
-    *status = 1; 
-}
 
 if (*status==1) {nwritt++;
   cout << "Chac " << pi_p.size() << " " <<  pi_m.size() << " ntrack " << pi_p.size() + pi_m.size() << " ks_size " << k_s.size() << " lam size " << lam.size() + alam.size() <<endl;
