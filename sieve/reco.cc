@@ -8,7 +8,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "ecm rm2l dsm dm dsp dp ntr chxc");
+    "ecm rm dsm dm dsp dp ntr chxc");
 };
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
@@ -127,9 +127,15 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D_p, m_ptypeDP, k_p, k_m, pi_p, 0.05);
   combination(D_m, m_ptypeDM, k_p, k_m, pi_m, 0.05);
 
+  //Rho0
+
+  std::vector<Particle> rho;
+
+  combination(rho, m_ptypeRHO0, pi0, pi0);
+  
   //D0
 
-  std::vector<Particle> D0, aD0, D0_to_ds, aD0_to_ds;
+  std::vector<Particle> D0, aD0, D0_to_ds, aD0_to_ds, __D0;
 
   combination(D0, m_ptypeD0, k_m, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi_m, 0.05);
@@ -140,21 +146,16 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0, m_ptypeD0, k_m, pi0, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi0, pi_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi_m, pi_p, pi0, 0.05);
+  combination(__D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
 
 
-  combinagittion(D0_to_ds, m_ptypeD0, pi0, pi0, k_m, pi_p, 0.05);
-  combination(aD0_to_ds, m_ptypeD0B, pi0, pi0, k_p, pi_m, 0.05);
+  combinagittion(D0_to_ds, m_ptypeD0, rho, k_m, pi_p, 0.05);
+  combination(aD0_to_ds, m_ptypeD0B, rho, k_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_m, k_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, k_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_s, pi0, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi0, 0.05);
-
-  combination(D0, m_ptypeD0, k_m, k_p, 0.05);
-  combination(aD0, m_ptypeD0B, k_m, k_m, 0.05);
+  combination(__D0, m_ptypeD0, k_s, pi0, 0.05);
 
   //D star
 
@@ -163,10 +164,16 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0_st, m_ptypeDstar0, D0, pi0, 0.03);
   combination(aD0_st, m_ptypeDstarB, aD0, pi0, 0.03);
 
+  combination(D0_st, m_ptypeDstar0, __D0, pi0, 0.03);
+  combination(aD0_st, m_ptypeDstarB, __D0, pi0, 0.03);
+
   std::vector<Particle> D_p_st, D_m_st;
 
   combination(D_p_st, m_ptypeDstarP, D0, pi_p, 0.03);
   combination(D_m_st, m_ptypeDstarM, aD0, pi_m, 0.03);
+
+  combination(D_p_st, m_ptypeDstarP, __D0, pi_p, 0.03);
+  combination(D_m_st, m_ptypeDstarM, __D0, pi_m, 0.03);
 
   combination(D_p_st, m_ptypeDstarP, D0_to_ds, pi_p, 0.03);
   combination(D_m_st, m_ptypeDstarM, aD0_to_ds, pi_m, 0.03);
@@ -206,6 +213,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(X_c, m_ptypeUPS4, aD0, ap);
   setUserInfo(X_c, {{"chanel", 1}, {"charg", 1}, {"baryon_num", 1}});
 
+  combination(X_c, m_ptypeUPS4, __D0, p);
+  combination(X_c, m_ptypeUPS4, __D0, ap);
+  setUserInfo(X_c, {{"chanel", 1}, {"charg", 1}, {"baryon_num", 1}});
+
   combination(X_c, m_ptypeUPS4, D_p, p, pi_m);
   combination(X_c, m_ptypeUPS4, D_m, ap, pi_p);
   setUserInfo(X_c, {{"chanel", 2}, {"charg", 1}, {"baryon_num", 1}});
@@ -240,10 +251,10 @@ for(int j=0; j<X_c.size(); ++j){
     }
     else{
       t1->column("dm", ach.p().m());
-      t1->column("dp", ach.p().mag());
+      t1->column("dp", ach.p().vect());
     }
 
-    t1->column("rm2l", (beam - (x_c.p())).m());    
+    t1->column("rm", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    
     t1->column("ntr", ntr);
     t1->column("chxc", chxc.channel().find("chanel")->second);
