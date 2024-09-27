@@ -16,6 +16,23 @@ then
     exit 1
 fi
 
+if test $3
+then
+    run1=$3
+    else
+    echo run1 number is missing
+    exit 1
+fi
+
+export scriptfile=/gpfs/home/belle2/matrk/mcscripts/${exp}.${run}.${run1}.script
+
+
+if [ ! -f ${scriptfile} ]
+then 
+    exit
+fi
+
+
 #####################################
 source /sw/belle/local/etc/bashrc_general
 
@@ -32,7 +49,12 @@ export BELLE_MESSAGE_LEVEL=INFO
 
 unset BELLE_USE_TMP
 
+export QQ_USER_TABLE="./user.dec"
+
+
 (
+
+
 cat <<EOF
 
 module register fix_mdst User_reco user_index
@@ -40,14 +62,13 @@ path add_module main fix_mdst  User_reco user_index
 path add_condition main <:0:KILL
 
 initialize
-output open       index_mc/${exp}.${run}.index
-histogram define  hbk_mc/${exp}.${run}.hist
-
-process_url "http://bweb3/montecarlo.php?bl=caseB&ty=evtgen-charm&ex=${exp}&rs=${run}00&re=${run}99&dv=zfserv"
-
+output open       index_mc/${exp}.${run}.${run1}.index
+histogram define  hbk_mc/${exp}.${run}.${run1}.hist
 EOF
+
+cat  ${scriptfile}
 
 echo terminate
 
-) | basf >  log_mc/${exp}.${run}.log 2>&1
+) | basf >  log_mc/${exp}.${run}.${run1}.log 2>&1
 

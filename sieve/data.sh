@@ -24,9 +24,19 @@ then
     exit 1
 fi
 
+export scriptfile=/gpfs/home/belle2/matrk/datascripts/${exp}.${run}.${run1}.script
+
+
+if [ ! -f ${scriptfile} ]
+then 
+    exit
+fi
+
+
 
 #####################################
 source /sw/belle/local/etc/bashrc_general
+
 
 
 export USE_GRAND_REPROCESS_DATA=1
@@ -44,7 +54,8 @@ unset BELLE_USE_TMP
 export QQ_USER_TABLE="./user.dec"
 
 (
-cat <<EOF
+    
+    cat <<EOF
 
 module register fix_mdst User_reco user_index
 path add_module main fix_mdst  User_reco user_index
@@ -53,14 +64,12 @@ path add_condition main <:0:KILL
 initialize
 output open       index_data/${exp}.${run}.${run1}.index
 histogram define  hbk_data/${exp}.${run}.${run1}.hist
-
-process_url "http://bweb3/mdst.php?bl=caseB&skm=HadronB&ex=${exp}&rs=${run}${run1}0&re=${run}${run1}9&dv=zfserv&dt=Any"
-
-process_url "http://bweb3/mdst.php?bl=caseB&skm=HadronBJ&ex=${exp}&rs=${run}${run1}0&re=${run}${run1}9&dv=zfserv&dt=Any"
-
 EOF
+
+cat  ${scriptfile}
 
 echo terminate
 
-) |basf >  log_data/${exp}.${run}.${run1}.log 2>&1
+) |basf >  log_data/${exp}.${run}.${run1} 2>&1
+#)  >  ../log/${exp}.${run}.${run1} 2>&1
 
