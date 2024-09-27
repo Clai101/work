@@ -287,10 +287,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(X_c, m_ptypeUPS4, D_m_st, ap, pi_p);
   setUserInfo(X_c,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", 1}});
 
-  combination(X_c, m_ptypeUPS4, lamc_m);
-  combination(X_c, m_ptypeUPS4, lamc_p);
-  setUserInfo(X_c,  {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}});
-
   combination(X_c, m_ptypeUPS4, lamc_m, rho);
   combination(X_c, m_ptypeUPS4, lamc_p, rho);
   setUserInfo(X_c,  {{"chanel", 6}, {"charg", 1}, {"baryon_num", 1}});
@@ -339,7 +335,86 @@ for(int j=0; j<X_c.size(); ++j){
 
     t1->dumpData();
     *status = 1; 
+}
 
+for(int j=0; j<lamc_p.size(); ++j){
+    Particle x_c=X_c[j];
+
+    Particle ach = x_c.child(0);
+    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
+    
+    if ((beam - (x_c.p())).m2() > 3 * 3) continue;
+    int ntr=0;
+    
+    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
+    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
+    
+    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
+      t1->column("dsm", ach.p().m());
+      t1->column("ch", abs(ach.pType().lund())-400);
+      t1->column("dsp", pStar(ach, elec, posi).vect().mag());
+      t1->column("dm", ach.child(0).p().m());
+      t1->column("dp", pStar(ach.child(0), elec, posi).vect().mag());
+    }
+    else{
+      t1->column("dm", ach.p().m());
+      t1->column("dp", pStar(ach, elec, posi).vect().mag());
+    }
+    if(chxc.channel().find("chanel")->second == 3){
+      UserInfo chac = static_cast<UserInfo&>(ach.userInfo());
+      t1->column("chac", chac.channel().find("chanel")->second);
+    }
+    else{
+      t1->column("chac", 0);
+    }
+
+    t1->column("rm", (beam - (x_c.p())).m());    
+    t1->column("ecm", ecm);    
+    t1->column("ntr", ntr);
+    t1->column("chxc", 5);
+
+    t1->dumpData();
+    *status = 1; 
+}
+
+for(int j=0; j<lamc_m.size(); ++j){
+    Particle x_c=X_c[j];
+
+    Particle ach = x_c.child(0);
+    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
+    
+    if ((beam - (x_c.p())).m2() > 3 * 3) continue;
+    int ntr=0;
+    
+    for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
+    for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
+    
+    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
+      t1->column("dsm", ach.p().m());
+      t1->column("ch", abs(ach.pType().lund())-400);
+      t1->column("dsp", pStar(ach, elec, posi).vect().mag());
+      t1->column("dm", ach.child(0).p().m());
+      t1->column("dp", pStar(ach.child(0), elec, posi).vect().mag());
+    }
+    else{
+      t1->column("dm", ach.p().m());
+      t1->column("dp", pStar(ach, elec, posi).vect().mag());
+    }
+    if(chxc.channel().find("chanel")->second == 3){
+      UserInfo chac = static_cast<UserInfo&>(ach.userInfo());
+      t1->column("chac", chac.channel().find("chanel")->second);
+    }
+    else{
+      t1->column("chac", 0);
+    }
+
+    t1->column("rm", (beam - (x_c.p())).m());    
+    t1->column("ecm", ecm);    
+    t1->column("ntr", ntr);
+    t1->column("chxc", 5);
+
+    t1->dumpData();
+    *status = 1; 
 }
 
 
