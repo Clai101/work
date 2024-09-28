@@ -346,7 +346,6 @@ cout << "____________flag 3____________\n";
 
 for(int j=0; j<lamc_p.size(); ++j){
     Particle x_c=lamc_p[j];
-    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
     
     if ((beam - (x_c.p())).m2() > 3 * 3) continue;
     int ntr=0;
@@ -366,7 +365,6 @@ for(int j=0; j<lamc_p.size(); ++j){
 for(int j=0; j<lamc_m.size(); ++j){
     Particle x_c=lamc_m[j];
 
-    UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
     
     if ((beam - (x_c.p())).m2() > 3 * 3) continue;
     int ntr=0;
