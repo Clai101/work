@@ -141,7 +141,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   if(p.size() + lam.size() + ap.size() + alam.size() < 0.5) return;
   //fill vectors pi0 gamma
   makePi0(pi0);
-  makeGamma(gamma)
+  makeGamma(gamma);
   //makeK0(k0, ak0);
   withPCut(gamma, 0.05);
   withEminCutPi0(pi0, 0.05);
@@ -227,6 +227,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D_p_st, m_ptypeDstarP, D_p, pi0, 0.03);
   combination(D_m_st, m_ptypeDstarM, D_m, pi0, 0.03);
 
+cout << "____________flag 0____________\n";
   std::vector<Particle> lamc_p, lamc_m;
 
   combination(lamc_p, m_ptypeDstarP, p, k_m, pi_p, 0.015);
@@ -241,6 +242,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(lamc_p, m_ptypeDstarP, p, k_s, pi0, 0.015);
   combination(lamc_m, m_ptypeDstarP, ap, k_s, pi0, 0.015);
 
+cout << "____________flag 1____________\n";
   
   for(std::vector<Particle>::iterator D = D0_st.begin(); D!=D0_st.end(); ++D) {
     if (abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015 or D->mass() - D->child(0).mass() > 0.155) {
@@ -297,7 +299,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(X_c, m_ptypeUPS4, lamc_p, rho, rho);
   setUserInfo(X_c,  {{"chanel", 7}, {"charg", 1}, {"baryon_num", 1}});
 
-
+cout << "____________flag 2____________\n";
 
 for(int j=0; j<X_c.size(); ++j){
     Particle x_c=X_c[j];
@@ -338,6 +340,9 @@ for(int j=0; j<X_c.size(); ++j){
     t1->dumpData();
     *status = 1; 
 }
+
+cout << "____________flag 3____________\n";
+
 
 for(int j=0; j<lamc_p.size(); ++j){
     Particle x_c=lamc_p[j];
