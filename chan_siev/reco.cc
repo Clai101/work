@@ -96,7 +96,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   makeProton(p, ap, 1);
 
   //fill vectors lam, alam, p, ap
-  makeLambda(lam,alam);
+  makeLambda(lam, alam);
   makeProton(p, ap, 1);
 
   //filter vectors p, ap
@@ -141,7 +141,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   if(p.size() + lam.size() + ap.size() + alam.size() < 0.5) return;
   //fill vectors pi0 gamma
   makePi0(pi0);
+  makeGamma(gamma)
   //makeK0(k0, ak0);
+  withPCut(gamma, 0.05);
   withEminCutPi0(pi0, 0.05);
 
   //Undetected particles
