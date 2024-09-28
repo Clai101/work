@@ -338,9 +338,7 @@ for(int j=0; j<X_c.size(); ++j){
 }
 
 for(int j=0; j<lamc_p.size(); ++j){
-    Particle x_c=X_c[j];
-
-    Particle ach = x_c.child(0);
+    Particle x_c=lamc_p[j];
     UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
     
     if ((beam - (x_c.p())).m2() > 3 * 3) continue;
@@ -348,25 +346,6 @@ for(int j=0; j<lamc_p.size(); ++j){
     
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
-    
-    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
-      t1->column("dsm", ach.p().m());
-      t1->column("ch", abs(ach.pType().lund())-400);
-      t1->column("dsp", pStar(ach, elec, posi).vect().mag());
-      t1->column("dm", ach.child(0).p().m());
-      t1->column("dp", pStar(ach.child(0), elec, posi).vect().mag());
-    }
-    else{
-      t1->column("dm", ach.p().m());
-      t1->column("dp", pStar(ach, elec, posi).vect().mag());
-    }
-    if(chxc.channel().find("chanel")->second == 3){
-      UserInfo chac = static_cast<UserInfo&>(ach.userInfo());
-      t1->column("chac", chac.channel().find("chanel")->second);
-    }
-    else{
-      t1->column("chac", 0);
-    }
 
     t1->column("rm", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    
@@ -378,9 +357,8 @@ for(int j=0; j<lamc_p.size(); ++j){
 }
 
 for(int j=0; j<lamc_m.size(); ++j){
-    Particle x_c=X_c[j];
+    Particle x_c=lamc_m[j];
 
-    Particle ach = x_c.child(0);
     UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
     
     if ((beam - (x_c.p())).m2() > 3 * 3) continue;
@@ -389,24 +367,6 @@ for(int j=0; j<lamc_m.size(); ++j){
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
     
-    if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
-      t1->column("dsm", ach.p().m());
-      t1->column("ch", abs(ach.pType().lund())-400);
-      t1->column("dsp", pStar(ach, elec, posi).vect().mag());
-      t1->column("dm", ach.child(0).p().m());
-      t1->column("dp", pStar(ach.child(0), elec, posi).vect().mag());
-    }
-    else{
-      t1->column("dm", ach.p().m());
-      t1->column("dp", pStar(ach, elec, posi).vect().mag());
-    }
-    if(chxc.channel().find("chanel")->second == 3){
-      UserInfo chac = static_cast<UserInfo&>(ach.userInfo());
-      t1->column("chac", chac.channel().find("chanel")->second);
-    }
-    else{
-      t1->column("chac", 0);
-    }
 
     t1->column("rm", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    

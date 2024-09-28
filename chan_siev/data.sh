@@ -70,6 +70,6 @@ cat  ${scriptfile}
 
 echo terminate
 
-) |basf >  log_data/${exp}.${run}.${run1} 2>&1
+) |basf >  log_data/${exp}.${run}.${run1}.log 2>&1
 #)  >  ../log/${exp}.${run}.${run1} 2>&1
 
