@@ -7,6 +7,13 @@ else
     echo exp number is missing
     exit 1
 fi
+if test $2
+then
+    run=$2
+    else
+    echo run number is missing
+    exit 1
+fi
 
 source /sw/belle/local/etc/bashrc_general
 

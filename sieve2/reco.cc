@@ -8,9 +8,9 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_inc",
-    "ecm rm2l dsm dm dsp dp ntr chxc");
+    "ecm rml dsm dm dsp dp ntr chxc");
   t2 = BASF_Histogram->ntuple ("lmbda",
-    "ecm en rm2l dsm dm dsp dp ntr chxc chlc mlc rm2n rm2nu q2");
+    "ecm en rml dsm dm dsp dp ntr chxc chlc mlc rmn rmnu q");
 };
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
@@ -174,7 +174,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setUserInfo(lamc_m,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", 1}});
   setUserInfo(lamc_p,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", -1}});
 
-
   combination(lamc_m, m_ptypeLAMC, ap, k_p, pi_m, 0.05);
   combination(lamc_p, m_ptypeLAMC, p, k_m, pi_p, 0.05);
   setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}});
@@ -216,21 +215,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D_p, m_ptypeDP, k_p, k_m, pi_p, 0.05);
   combination(D_m, m_ptypeDM, k_p, k_m, pi_m, 0.05);
 
-//  for(std::vector<Particle>::iterator D = D_p.begin(); D!=D_p.end(); ++D) {
-//    if (pStar(*D,elec,posi).vect().mag()<2.0) {
-//      D_p.erase(D); --D; 
-//    }
-//  }
-//
-//  for(std::vector<Particle>::iterator D = D_m.begin(); D!=D_m.end(); ++D) {
-//    if (pStar(*D,elec,posi).vect().mag()<2.0) {
-//      D_m.erase(D); --D; 
-//    }
-//  }
-
   //D0
 
-  std::vector<Particle> D0, aD0, D0_to_ds, aD0_to_ds;
+  std::vector<Particle> D0, aD0, D0_to_ds, aD0_to_ds, __D0;
 
   combination(D0, m_ptypeD0, k_m, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi_m, 0.05);
@@ -241,21 +228,16 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0, m_ptypeD0, k_m, pi0, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi0, pi_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi_m, pi_p, pi0, 0.05);
+  combination(__D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
 
 
-  combination(D0_to_ds, m_ptypeD0, pi0, pi0, k_m, pi_p, 0.05);
-  combination(aD0_to_ds, m_ptypeD0B, pi0, pi0, k_p, pi_m, 0.05);
+  combination(D0_to_ds, m_ptypeD0, rho, k_m, pi_p, 0.05);
+  combination(aD0_to_ds, m_ptypeD0B, rho, k_p, pi_m, 0.05);
 
   combination(D0, m_ptypeD0, k_m, k_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, k_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_s, pi0, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi0, 0.05);
-
-  combination(D0, m_ptypeD0, k_m, k_p, 0.05);
-  combination(aD0, m_ptypeD0B, k_m, k_m, 0.05);
+  combination(__D0, m_ptypeD0, k_s, pi0, 0.05);
 
   //D star
 
@@ -264,16 +246,23 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0_st, m_ptypeDstar0, D0, pi0, 0.03);
   combination(aD0_st, m_ptypeDstarB, aD0, pi0, 0.03);
 
+  combination(D0_st, m_ptypeDstar0, __D0, pi0, 0.03);
+  combination(aD0_st, m_ptypeDstarB, __D0, pi0, 0.03);
+
   std::vector<Particle> D_p_st, D_m_st;
 
   combination(D_p_st, m_ptypeDstarP, D0, pi_p, 0.03);
   combination(D_m_st, m_ptypeDstarM, aD0, pi_m, 0.03);
+
+  combination(D_p_st, m_ptypeDstarP, __D0, pi_p, 0.03);
+  combination(D_m_st, m_ptypeDstarM, __D0, pi_m, 0.03);
 
   combination(D_p_st, m_ptypeDstarP, D0_to_ds, pi_p, 0.03);
   combination(D_m_st, m_ptypeDstarM, aD0_to_ds, pi_m, 0.03);
 
   combination(D_p_st, m_ptypeDstarP, D_p, pi0, 0.03);
   combination(D_m_st, m_ptypeDstarM, D_m, pi0, 0.03);
+  
   
   for(std::vector<Particle>::iterator D = D0_st.begin(); D!=D0_st.end(); ++D) {
     if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)) {
@@ -362,7 +351,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     }
 
     t2->column("p", pStar(u, elec, posi).vect().mag());
-    t2->column("rm2l", (beam - (x_c.p())).m());    
+    t2->column("rml", (beam - (x_c.p())).m());    
     t2->column("en", pStar(u, elec, posi).e());
     t2->column("ecm", ecm);
     t2->column("ntr", ntr);
@@ -371,9 +360,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t2->column("chlc", chlc.channel().find("chanel")->second);
     t2->column("mlc", lamc.p().m() - lamc.pType().mass());
 
-    t2->column("rm2n", (beam - u.p()).m2());
-    t2->column("rm2nu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
-    t2->column("q2", (lamc.p() - lamc.child(0).p()).m2());
+    t2->column("rmn", (beam - u.p()).m());
+    t2->column("rmnu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m());
+    t2->column("q", (lamc.p() - lamc.child(0).p()).m());
 
     t2->dumpData();
 
