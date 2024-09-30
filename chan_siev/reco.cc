@@ -334,7 +334,6 @@ for(int j=0; j<X_c.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", chxc.channel().find("chanel")->second);
 
-    t1->dumpData();
     *status = 1; 
 }
 
@@ -354,7 +353,6 @@ for(int j=0; j<lamc_p.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", 5);
 
-    t1->dumpData();
     *status = 1; 
 }
 
@@ -374,14 +372,17 @@ for(int j=0; j<lamc_m.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", 5);
 
-    t1->dumpData();
     *status = 1; 
 }
 
+if (*status==1) {
+  t1->dumpData();
+}
 
 if (*status==1) {nwritt++;
   cout << "Chac " << pi_p.size() << " " <<  pi_m.size() << " ntrack " << pi_p.size() + pi_m.size() << " ks_size " << k_s.size() << " lam size " << lam.size() + alam.size() <<endl;
 }
+
 }
 
 #if defined(BELLE_NAMESPACE)
