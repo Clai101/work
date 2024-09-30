@@ -27,7 +27,7 @@ export BELLE_MESSAGE_LEVEL=INFO
 
 unset BELLE_USE_TMP
 
-filelist=`find /gpfs/home/belle2/matrk/work/sieve/index_mc -name $exp.$run.index -size +0c|sort`
+filelist=`find /gpfs/home/belle2/matrk/work/sieve/index_mc -name $exp.$run\*.index -size +0c|sort`
 
 outfile=hbk_mc/$exp.$run.hist
 logfile=log_mc/$exp.$run.log
