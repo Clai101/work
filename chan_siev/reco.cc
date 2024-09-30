@@ -139,9 +139,11 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   //Cheak hadrons in case  if(p.size() + ap.size() + lam.size() + alam.size() < 1.5) return;
 
   if(p.size() + lam.size() + ap.size() + alam.size() < 0.5) return; 
+
   //fill vectors pi0 gamma
   makePi0(pi0);
   makeGamma(gamma);
+
   //makeK0(k0, ak0);
   withPCut(gamma, 0.05);
   withEminCutPi0(pi0, 0.05);
@@ -293,11 +295,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(X_c, m_ptypeUPS4, lamc_p, rho);
   setUserInfo(X_c,  {{"chanel", 6}, {"charg", 1}, {"baryon_num", 1}});
 
-  combination(X_c, m_ptypeUPS4, lamc_m, rho, rho);
-  combination(X_c, m_ptypeUPS4, lamc_p, rho, rho);
-  setUserInfo(X_c,  {{"chanel", 7}, {"charg", 1}, {"baryon_num", 1}});
-
-
 for(int j=0; j<X_c.size(); ++j){
     Particle x_c=X_c[j];
 
@@ -334,6 +331,7 @@ for(int j=0; j<X_c.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", chxc.channel().find("chanel")->second);
 
+    t1->dumpData();
     *status = 1; 
 }
 
@@ -353,6 +351,7 @@ for(int j=0; j<lamc_p.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", 5);
 
+    t1->dumpData();
     *status = 1; 
 }
 
@@ -372,12 +371,10 @@ for(int j=0; j<lamc_m.size(); ++j){
     t1->column("ntr", ntr);
     t1->column("chxc", 5);
 
+    t1->dumpData();
     *status = 1; 
 }
 
-if (*status==1) {
-  t1->dumpData();
-}
 
 if (*status==1) {nwritt++;
   cout << "Chac " << pi_p.size() << " " <<  pi_m.size() << " ntrack " << pi_p.size() + pi_m.size() << " ks_size " << k_s.size() << " lam size " << lam.size() + alam.size() <<endl;
