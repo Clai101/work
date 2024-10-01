@@ -312,6 +312,38 @@ void pr(VectorL p){
   cout << p.px() << "\t|\t" << p.py() << "\t|\t" << p.pz() << "\t|\t" << p.e() << "\t|\t" << sqrt(p.m2());
 }
 
+etGenHepInfoTlost(Particle &p){
+  int nchildren = p.nChildren();
+  if(!nchildren) return;
+
+  // Check that genHep references exist;
+  for(int i=0; i<nchildren; ++i)
+    if(!p.relation().child(i).genHepevt()) return;
+
+  // Check that child particles haven't same genHep reference;
+  for(int i=0; i<nchildren-1; ++i)
+    for(int j=i+1; j<nchildren; ++j)
+      if(p.relation().child(i).genHepevt().get_ID() == 
+         p.relation().child(j).genHepevt().get_ID() ) return;
+
+  // Seek mother by the first daughter;
+  const Gen_hepevt *mother(&(p.child(0).genHepevt()));
+  while(mother->mother()){
+    mother = &(mother->mother());
+    if(mother->idhep() == p.pType().lund()) break;
+  }
+  if(mother->idhep() != p.pType().lund()) return;
+  
+  // Check for other children that have the same mother;
+  for(int i=1; i<nchildren; ++i){
+    const Gen_hepevt *tmp(&(p.child(i).genHepevt()));
+    if ((tmp.lund() == 14) or (tmp.lund() == 12)) continue;
+    while(tmp->mother()){
+      tmp = &tmp->mother();
+      if(tmp == mother) break;
+    }
+    if(tmp != mother) return;
+  }
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
 
@@ -536,11 +568,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   doKvFit(lamcl_m, true);
   doKvFit(lamcl_p, true);
 
-  setGenHepInfoT(lamcl_m);
-  setGenHepInfoT(lamcl_p);
-
-  deepCopy(lamcl_m, lamc_m);
-  deepCopy(lamcl_p, lamc_p);
+  setGenHepInfoTlund(lamcl_m);
+  setGenHepInfoTlund(lamcl_p);
 
  
 
@@ -734,7 +763,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(ups, m_ptypeUPS4, lamc_m, X_c);
   combination(ups, m_ptypeUPS4, lamc_p, aX_c);
 
-  cout << "4\n" ;
+  combination(ups, m_ptypeUPS4, lamc_m, X_c);
+  combination(ups, m_ptypeUPS4, lamc_p, aX_c);
+
 
 
 

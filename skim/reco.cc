@@ -10,10 +10,10 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm p np ntr en_gam enc_gam chxc pxc npxc mxc chach mach chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rm2n nrm2n rm2l nrm2l pn npn rm2nu nrm2nu fnrm2nu chi q2");
+    "en nen ecm p np ntr en_gam enc_gam chxc pxc npxc mxc chach mach chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
-    "en ecm p ntr chu chrgach chach mach rm2lc");
+    "en ecm p ntr chu chrgach chach mach rmlc");
   */
 };
 
@@ -732,7 +732,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     for(int jj=0; jj<pi_m.size(); ++jj) 
     if (!checkSame(pi_m[jj],u)) ntr++;
 
-    cout << "5.1\n" ;
 
     float en_gam=0, enc_gam=0;
     for(int jj=0; jj<gamma.size(); ++jj){
@@ -777,8 +776,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       nx_c.append_daughter(par2);
       nx_c.append_daughter(par3);
     }
-
-    cout << "5.3\n" ;
 
     nu = Particle(lamc.p() + nx_c.p(),  m_ptypeUPS4);
     nu.append_daughter(lamc);
@@ -843,23 +840,23 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
 
     t1->column("p_lam", pStar(lam, elec, posi).vect().mag());    
-    t1->column("q2", (lamc.p() - lamc.child(0).p()).m2());
-    t1->column("q2_nl", (beam - u.p() + lamc.child(1).p()).m2());
+    t1->column("q", (lamc.p() - lamc.child(0).p()).m2());
+    t1->column("q_nl", (beam - u.p() + lamc.child(1).p()).m2());
 
 
     t1->column("ang_l_xc", pStar(lamc, elec, posi).vect().angle(pStar(x_c, elec, posi).vect()));
     t1->column("nang_l_xc", pStar(lamc, elec, posi).vect().angle(pStar(nx_c, elec, posi).vect()));
 
 
-    t1->column("rm2n", (beam - u.p()).m2());
-    t1->column("nrm2n", (beam - nu.p()).m2());
+    t1->column("rmn", (beam - u.p()).m2());
+    t1->column("nrmn", (beam - nu.p()).m2());
     t1->column("npn", (beam - nu.p()).vect().mag());
     t1->column("pn", (beam - u.p()).vect().mag());
-    t1->column("rm2l", (beam - x_c.p()).m());
-    t1->column("nrm2l", (beam - (nx_c.p())).m());
+    t1->column("rml", (beam - x_c.p()).m());
+    t1->column("nrml", (beam - (nx_c.p())).m());
     
-    t1->column("rm2nu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
-    t1->column("nrm2nu", (beam - (nx_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
+    t1->column("rmnu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
+    t1->column("nrmnu", (beam - (nx_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
     
 
     t1->column("fox", r2);
