@@ -349,9 +349,11 @@ etGenHepInfoTlost(Particle &p){
       tmp = &tmp->mother();
       if(tmp == mother) break;
     }
-  if(tmp != mother) return;
-  p.relation().genHepevt(*mother);
+    if(tmp != mother) return;
   }
+
+  p.relation().genHepevt(*mother);
+}
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
 
