@@ -319,6 +319,7 @@ etGenHepInfoTlost(std::vector<Particle> &p_list){
     etGenHepInfoTlost(p_list[i]);
 }
 
+void
 etGenHepInfoTlost(Particle &p){
   int nchildren = p.nChildren();
   if(!nchildren) return;
