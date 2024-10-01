@@ -577,8 +577,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   doKvFit(lamcl_m, true);
   doKvFit(lamcl_p, true);
 
-  setGenHepInfoTlund(lamcl_m);
-  setGenHepInfoTlund(lamcl_p);
+  setGenHepInfoTlost(lamcl_m);
+  setGenHepInfoTlost(lamcl_p);
 
  
 
