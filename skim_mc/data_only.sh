@@ -10,7 +10,7 @@ for i in  07 09  11 13 15 17 19 21 23 25 27  31 33 35 37 39 41 43 45 47 49 51 53
 
 do 
 
-./index.sh $i data &
+bsub -qs /sw/belle/local/bin/centos7-exec ./index.sh $i data &
 
 done
 
