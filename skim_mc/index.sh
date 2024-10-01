@@ -2,14 +2,14 @@
 
 if test $1
 then
-    type=$1
+    exp=$1
 else
     echo exp number is missing
     exit 1
 fi
 if test $2
 then
-    exp=$2
+    type=$2
 else
     echo exp number is missing
     exit 1
