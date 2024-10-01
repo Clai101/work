@@ -337,7 +337,6 @@ etGenHepInfoTlost(Particle &p){
   // Check for other children that have the same mother;
   for(int i=1; i<nchildren; ++i){
     const Gen_hepevt *tmp(&(p.child(i).genHepevt()));
-    if ((tmp.pType().lund() == 14) or (tmp.pType().lund() == 12)) continue;
     while(tmp->mother()){
       tmp = &tmp->mother();
       if(tmp == mother) break;
