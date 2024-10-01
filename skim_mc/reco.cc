@@ -312,15 +312,8 @@ void pr(VectorL p){
   cout << p.px() << "\t|\t" << p.py() << "\t|\t" << p.pz() << "\t|\t" << p.e() << "\t|\t" << sqrt(p.m2());
 }
 
-
-void 
-etGenHepInfoTlost(std::vector<Particle> &p_list){
-  for(unsigned int i=0; i<p_list.size(); ++i)
-    etGenHepInfoTlost(p_list[i]);
-}
-
 void
-etGenHepInfoTlost(Particle &p){
+setGenHepInfoTlost(Particle &p){
   int nchildren = p.nChildren();
   if(!nchildren) return;
 
@@ -354,6 +347,13 @@ etGenHepInfoTlost(Particle &p){
 
   p.relation().genHepevt(*mother);
 }
+
+void 
+setGenHepInfoTlost(std::vector<Particle> &p_list){
+  for(unsigned int i=0; i<p_list.size(); ++i)
+    setGenHepInfoTlost(p_list[i]);
+}
+
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
 
