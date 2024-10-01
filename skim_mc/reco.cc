@@ -491,15 +491,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   //withEminCutK0(k0, 0.05);
   makeGamma(gamma);
 
-  setGenHepInfoF(p);
-  setGenHepInfoF(k_m);
-  setGenHepInfoF(pi_p);
-  setGenHepInfoG(gamma);
-  setGenHepInfoF(ap);
-  setGenHepInfoF(k_p);
-  setGenHepInfoF(pi_m);
-  setGenHepInfoP(pi0);
-  setGenHepInfoKs(k_s);
 
 
   float f;
@@ -532,6 +523,25 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       lam.erase(l); --l;
     }
   }
+
+  setGenHepInfoF(p);
+  setGenHepInfoF(ap);
+  setGenHepInfoP(pi0);
+  setGenHepInfoKs(k_s);
+  
+  setGenHepInfoF(k_m);
+  setGenHepInfoF(k_p);
+  setGenHepInfoF(pi_p);
+  setGenHepInfoF(pi_m);
+  setGenHepInfoG(gamma);
+
+  setGenHepInfoF(e_p);
+  setGenHepInfoF(e_m);
+  setGenHepInfoF(mu_p);
+  setGenHepInfoF(mu_m);
+
+  setGenHepInfoT(alam);
+  setGenHepInfoT(lam);
 
   cout << "1.4\n";
   //Lambdac  
