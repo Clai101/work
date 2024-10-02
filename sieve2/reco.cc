@@ -7,8 +7,6 @@ namespace Belle {
 using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
-  t1 = BASF_Histogram->ntuple ("lmbda_inc",
-    "ecm rml dsm dm dsp dp ntr chxc");
   t2 = BASF_Histogram->ntuple ("lmbda",
     "ecm en rml dsm dm dsp dp ntr chxc chlc mlc rmn rmnu q");
 };
@@ -116,8 +114,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   makeKs(k_s);
   makeKPi(k_p, k_m, pi_p, pi_m, 1);
 
-  if (k_s.size() + k_m.size() + k_p.size() + lam.size() + alam.size() < 1.5) return;
-
   //filter vectors k_s, k_p, k_m, pi_p, pi_m 
   withDrDzCut(pi_p, 1., 2.);
   withDrDzCut(pi_m, 1., 2.);
@@ -137,9 +133,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       k_s.erase(l); --l; continue;
     }
   }
-
-  //Cheack charm consrvarion law and mesons in case
-  if (k_s.size() + k_m.size() + k_p.size() + lam.size() + alam.size() < 1.5) return;
 
   //fill vectors e_p, e_m, mu_p, mu_m
   makeLepton(e_p, e_m, mu_p, mu_m, 1);
@@ -200,6 +193,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   if(((p.size() < 0.5) and (lamc_m.size() < 0.5)) or ((ap.size() < 0.5) and (lamc_p.size() < 0.5))) return;
 
   //D_pm
+  std::vector<Particle> rho;
+
+  combination(rho, m_ptypeDM, pi_m, pi_p);
 
   std::vector<Particle> D_p, D_m;
 
@@ -209,8 +205,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D_p, m_ptypeDP, k_s, pi_p, 0.05);
   combination(D_m, m_ptypeDM, k_s, pi_m, 0.05);
 
-  combination(D_p, m_ptypeDP, k_s, pi_p, pi_p, pi_m, 0.05);
-  combination(D_m, m_ptypeDM, k_s, pi_m, pi_m, pi_p, 0.05);
+  combination(D_p, m_ptypeDP, k_s, pi_p, rho, 0.05);
+  combination(D_m, m_ptypeDM, k_s, pi_m, rho, 0.05);
 
   combination(D_p, m_ptypeDP, k_p, k_m, pi_p, 0.05);
   combination(D_m, m_ptypeDM, k_p, k_m, pi_m, 0.05);
@@ -222,13 +218,13 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(D0, m_ptypeD0, k_m, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi_m, 0.05);
 
-  combination(D0, m_ptypeD0, k_s, pi_p, pi_m, 0.05);
-  combination(aD0, m_ptypeD0B, k_s, pi_p, pi_m, 0.05);
+  combination(D0, m_ptypeD0, k_s, rho, 0.05);
+  combination(aD0, m_ptypeD0B, k_s, rho, 0.05);
 
   combination(D0, m_ptypeD0, k_m, pi0, pi_p, 0.05);
   combination(aD0, m_ptypeD0B, k_p, pi0, pi_m, 0.05);
 
-  combination(__D0, m_ptypeD0, k_s, pi_m, pi_p, pi0, 0.05);
+  combination(__D0, m_ptypeD0, k_s, rho, pi0, 0.05);
 
 
   combination(D0_to_ds, m_ptypeD0, rho, k_m, pi_p, 0.05);
@@ -367,7 +363,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t2->dumpData();
 
     if (ntr > 1.5) continue;
-  
   *status = 1; 
 }
 

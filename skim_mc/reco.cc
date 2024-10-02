@@ -563,8 +563,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}});
   setUserInfo(lamc_p, {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}});
 
-  //p k e/mu
-
   doKvFit(lamc_m);
   doKvFit(lamc_p);
 
