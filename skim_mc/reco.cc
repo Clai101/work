@@ -404,13 +404,21 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   //Base particles
 
+
   std::vector<Particle> p, ap, k_p, k_m, k0, pi_p, pi_m, pi0, gamma, gam, all, e_p, e_m, mu_m, mu_p, k_s, lam, alam;
 
-  cout << "1\n";
-  //fill vectors
+
+  //fill vectors lam, alam, p, ap
   makeLambda(lam,alam);
   makeProton(p, ap, 1);
 
+  //filter vectors p, ap
+  withProtonIdCut(p, ap, 0.6);
+
+  withDrDzCut(p, 1., 2.);
+  withDrDzCut(ap, 1., 2.);
+
+  //filter vectors lam, alam 
   for(std::vector<Particle>::iterator l = lam.begin(); l!=lam.end(); ++l) {
       HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
     Vector3 P(l->px(),l->py(),0);
@@ -418,13 +426,12 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     V.setZ(0.);
     double p_id;
     if (l->child(0).pType().mass()>l->child(1).pType().mass())
-      p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(0).mdstCharged()));
-    else p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(1).mdstCharged()));
-    if (abs(l->mass()-1.1157)>0.01 || l->mdstVee2().z_dist()>1. || p_id<0.6 ) {
+      p_id=atc_pid(3,-1,5,4,3).prob(&(l->child(0).mdstCharged()));
+    else p_id=atc_pid(3,-1,5,4,3).prob(&(l->child(1).mdstCharged()));
+    if (cos(V.angle(P))<0.99 || abs(l->mass()-1.1157)>0.01 || l->mdstVee2().z_dist()>1. || p_id<0.6 ) {
       lam.erase(l); --l;
     }
   }
-
 
   for(std::vector<Particle>::iterator l = alam.begin(); l!=alam.end(); ++l) {
     HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
@@ -433,96 +440,66 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     V.setZ(0.);
     double p_id;
     if (l->child(0).pType().mass()>l->child(1).pType().mass()) 
-    p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(0).mdstCharged()));
-    else p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(1).mdstCharged()));                               
-    if (abs(l->mass()-1.1157)>0.01 || l->mdstVee2().z_dist()>1. || p_id<0.6 ) {
+    p_id=atc_pid(3,-1,5,4,3).prob(&(l->child(0).mdstCharged()));
+    else p_id=atc_pid(3,-1,5,4,3).prob(&(l->child(1).mdstCharged()));                               
+    if (cos(V.angle(P))<0.99 || abs(l->mass()-1.1157)>0.01 || l->mdstVee2().z_dist()>1. || p_id<0.6 ) {
       alam.erase(l); --l;
     }
   }
-  withProtonIdCut(p, ap, 0.6);
-  withDrDzCut(p, 1., 2.);
-  withDrDzCut(ap, 1., 2.);
 
+  //fill vectors k_s, k_p, k_m, pi_p, pi_m
   makeKs(k_s);
   makeKPi(k_p, k_m, pi_p, pi_m, 1);
 
-  cout << "1.2\n";
-
-  //Cuts
-  withDrDzCut(e_m, 1., 2.);
-  withDrDzCut(e_p, 1., 2.);
-  withDrDzCut(mu_m, 1., 2.);
-  withDrDzCut(mu_p, 1., 2.);
-  withDrDzCut(k_m, 1., 2.);
-  withDrDzCut(k_p, 1., 2.);
+  //filter vectors k_s, k_p, k_m, pi_p, pi_m 
   withDrDzCut(pi_p, 1., 2.);
   withDrDzCut(pi_m, 1., 2.);
 
+  withDrDzCut(k_m, 1., 2.);
+  withDrDzCut(k_p, 1., 2.);
   withKaonIdCut(k_p, k_m, 0.6);
   
-
 
   for(std::vector<Particle>::iterator l = k_s.begin(); l!=k_s.end(); ++l) {
     HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
     Vector3 P(l->px(),l->py(),0);
     V=V-ip_position;
     V.setZ(0.);
-    if (abs(l->mass()-0.4977)>0.03 || V.perp()<0.1 ||
+    if (abs(l->mass()-0.4977)>0.015 || V.perp()<0.1 ||
     cos(V.angle(P))<0.99 || l->mdstVee2().z_dist()>1.) {
       k_s.erase(l); --l; continue;
     }
   }
 
-
-  //static int n_trash_track = 0, n_trash_str = 0, n_trash_bar = 0, n_trash_str_bar = 0;
-  int n_str = k_s.size() + k_m.size() + k_p.size() + lam.size() + alam.size();
-  if (n_str < 1.5) return;
-  if (pi_p.size() + pi_m.size() > 12.5) return;
-  
-
-
-
+  //fill vectors e_p, e_m, mu_p, mu_m
   makeLepton(e_p, e_m, mu_p, mu_m, 1);
-  withLeptonIdCut(e_p, e_m, mu_p, mu_m, 0.9, 0.95);
-  
+  withDrDzCut(e_m, 1., 2.);
+  withDrDzCut(e_p, 1., 2.);
+  withDrDzCut(mu_m, 1., 2.);
+  withDrDzCut(mu_p, 1., 2.);
+
+  withPCut(e_m, 0.6);
+  withPCut(e_p, 0.6);
+  withPCut(mu_m, 1);
+  withPCut(mu_p, 1);
+
+  withLeptonIdCut(e_p, e_m, mu_p, mu_m, 0.01, 0.1);
+
+  //fill vectors pi0 gamma
   makePi0(pi0);
   //makeK0(k0, ak0);
   withEminCutPi0(pi0, 0.05);
-  //withEminCutK0(k0, 0.05);
-  makeGamma(gamma);
-
-
 
   float f;
-  cout << "1.3\n";
+
 
   setPi0Error(pi0);
-  for(std::vector<Particle>::iterator iter_=gamma.begin(); iter_!=gamma.end(); iter_++){
-    if(pStar(*iter_, elec, posi).e() < 0.05){
-      gamma.erase(iter_); --iter_; continue;
-    }
-    setGammaError(*iter_, ip_position, runIp_err);
-  }
 
   doKmvFit(pi0, f);
-
   doKmvFit(k_s, f);
   doKmvFit(lam, f);
   doKmvFit(alam, f);
 
-  for(std::vector<Particle>::iterator l = lam.begin(); l!=lam.end(); ++l) {
-      HepPoint3D V(l->mdstVee2().vx(),l->mdstVee2().vy(),0);
-    Vector3 P(l->px(),l->py(),0);
-    V=V-ip_position;
-    V.setZ(0.);
-    double p_id;
-    if (l->child(0).pType().mass()>l->child(1).pType().mass())
-      p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(0).mdstCharged()));
-    else p_id=atc_pid(3,-1,5,4,2).prob(&(l->child(1).mdstCharged()));
-    if (abs(l->mass()-1.1157)>0.01 || l->mdstVee2().z_dist()>1. || p_id<0.6 ) {
-      lam.erase(l); --l;
-    }
-  }
 
   setGenHepInfoF(p);
   setGenHepInfoF(ap);
@@ -721,31 +698,26 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   cout << "3\n" ;
 
   for(std::vector<Particle>::iterator D = D0_st.begin(); D!=D0_st.end(); ++D) {
-    if (dynamic_cast<UserInfo&>(D->userInfo()).channel().find("chanel")->second == 1){
-      if (abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass()) > 0.015){
-        D0_st.erase(D); --D; continue;}}
-    if (dynamic_cast<UserInfo&>(D->userInfo()).channel().find("chanel")->second == 2){
-      if (abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass()) > 0.015){
-        D0_st.erase(D); --D; continue;}}}
+    if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)) {
+      D0_st.erase(D); --D;
+    }
+  }
 
   for(std::vector<Particle>::iterator D = aD0_st.begin(); D!=aD0_st.end(); ++D) {
-    if (dynamic_cast<UserInfo&>(D->userInfo()).channel().find("chanel")->second == 1){
-      if (abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass()) > 0.015){
-        aD0_st.erase(D); --D; continue;}}
-    if (dynamic_cast<UserInfo&>(D->userInfo()).channel().find("chanel")->second == 2){
-      if (abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass()) > 0.015){
-        aD0_st.erase(D); --D; continue;}}}
-
+    if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)){
+      aD0_st.erase(D); --D;
+    }
+  }
 
   for(std::vector<Particle>::iterator D = D_p_st.begin(); D!=D_p_st.end(); ++D) {
-    if (((abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass())) > 0.015)) {
-      D_p_st.erase(D); --D; continue;
+    if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)) {
+      D_p_st.erase(D); --D;
     }
   }
 
   for(std::vector<Particle>::iterator D = D_m_st.begin(); D!=D_m_st.end(); ++D) {
-    if (((abs(dynamic_cast<UserInfo&>(D->child(0).userInfo()).vmass() - D->child(0).pType().mass())) > 0.015)) {
-      D_m_st.erase(D); --D; continue;
+    if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)) {
+      D_m_st.erase(D); --D;
     }
   }
 
