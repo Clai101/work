@@ -520,8 +520,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setGenHepInfoF(mu_p);
   setGenHepInfoF(mu_m);
 
-  setGenHepInfoLam(alam);
-  setGenHepInfoLam(lam);
+  setGenHepInfoLambda(alam);
+  setGenHepInfoLambda(lam);
 
   //Lambdac  
 
@@ -548,8 +548,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   doKmvFit(lamc_m, f);
   doKmvFit(lamc_p, f);
 
-  setGenHepInfoL(lamc_m);
-  setGenHepInfoL(lamc_p);
+  setGenHepInfoT(lamc_m);
+  setGenHepInfoT(lamc_p);
 
   combination(lamcl_p, m_ptypeLAMC, lam, e_p);
   combination(lamcl_m, m_ptypeLAMC, alam, e_m);
