@@ -548,8 +548,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   doKmvFit(lamc_m, f);
   doKmvFit(lamc_p, f);
 
-  setGenHepInfoT(lamc_m);
-  setGenHepInfoT(lamc_p);
+  setGenHepInfoL(lamc_m);
+  setGenHepInfoL(lamc_p);
 
   combination(lamcl_p, m_ptypeLAMC, lam, e_p);
   combination(lamcl_m, m_ptypeLAMC, alam, e_m);
