@@ -319,7 +319,7 @@ setGenHepInfoTlost(Particle &p){
 
   // Check that genHep references exist;
   for(int i=0; i<nchildren; ++i){
-    cout << p.pType().lund() << '\n';
+    cout << p.relation().child(i).pType().lund() << '\n';
     if(!p.relation().child(i).genHepevt()) return;
   }
 
