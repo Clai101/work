@@ -318,14 +318,19 @@ setGenHepInfoTlost(Particle &p){
   if(!nchildren) return;
 
   // Check that genHep references exist;
-  for(int i=0; i<nchildren; ++i)
+  for(int i=0; i<nchildren; ++i){
+    cout << p.pType().lund() << '\n';
     if(!p.relation().child(i).genHepevt()) return;
+  }
+
+  cout << "Nicht der Illusion\n";
 
   // Check that child particles haven't same genHep reference;
   for(int i=0; i<nchildren-1; ++i)
     for(int j=i+1; j<nchildren; ++j)
       if(p.relation().child(i).genHepevt().get_ID() == 
-         p.relation().child(j).genHepevt().get_ID() ) return;
+         p.relation().child(j).genHepevt().get_ID()) return;
+  cout << "Nicht der Zwitter\n";
 
   // Seek mother by the first daughter;
   const Gen_hepevt *mother(&(p.child(0).genHepevt()));
@@ -334,7 +339,6 @@ setGenHepInfoTlost(Particle &p){
     if(mother->idhep() == p.pType().lund()) break;
   }
   if(mother->idhep() != p.pType().lund()) return;
-  
   // Check for other children that have the same mother;
   for(int i=1; i<nchildren; ++i){
     const Gen_hepevt *tmp(&(p.child(i).genHepevt()));
@@ -344,7 +348,7 @@ setGenHepInfoTlost(Particle &p){
     }
     if(tmp != mother) return;
   }
-
+  cout << "Schwester\n";
   p.relation().genHepevt(*mother);
 }
 
@@ -353,7 +357,6 @@ setGenHepInfoTlost(std::vector<Particle> &p_list){
   for(unsigned int i=0; i<p_list.size(); ++i)
     setGenHepInfoTlost(p_list[i]);
 }
-
 
 void User_reco::event ( BelleEvent* evptr, int* status ) {
 
@@ -520,7 +523,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setGenHepInfoT(alam);
   setGenHepInfoT(lam);
 
-  cout << "1.4\n";
   //Lambdac  
 
   std::vector<Particle> lamc_p, lamc_m, lamcl_p, lamcl_m;
@@ -559,15 +561,15 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setUserInfo(lamcl_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}});
   setUserInfo(lamcl_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}});
 
-  doKvFit(lamcl_m, true);
-  doKvFit(lamcl_p, true);
+  doKvFit(lamcl_m, f);
+  doKvFit(lamcl_p, f);
 
   setGenHepInfoTlost(lamcl_m);
   setGenHepInfoTlost(lamcl_p);
 
  
 
-  if (lamc_p.size()+lamc_m.size()==0) return;
+  if (lamc_p.size()+lamc_m.size()+lamcl_p.size()+lamcl_m.size()==0) return;
 
   cout << "2\n" ;
   std::vector<Particle> ups;
