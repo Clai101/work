@@ -520,8 +520,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setGenHepInfoF(mu_p);
   setGenHepInfoF(mu_m);
 
-  setGenHepInfoT(alam);
-  setGenHepInfoT(lam);
+  setGenHepInfoLam(alam);
+  setGenHepInfoLam(lam);
 
   //Lambdac  
 
