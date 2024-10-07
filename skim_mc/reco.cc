@@ -758,9 +758,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   combination(ups, m_ptypeUPS4, lamcl_m, aX_c);
 
 
-
-
-
   for(int j=0; j<ups.size(); ++j){
     Particle u=ups[j];
 
@@ -952,3 +949,5 @@ cout << "7\n" ;
 #if defined(BELLE_NAMESPACE)
 }
 #endif
+
+

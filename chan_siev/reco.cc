@@ -307,6 +307,8 @@ for(int j=0; j<X_c.size(); ++j){
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
     
+    if (ntr > 3) continue;
+
     if((abs(ach.pType().lund()) == 423) or (abs(ach.pType().lund()) == 413)){
       t1->column("dsm", ach.p().m());
       t1->column("ch", abs(ach.pType().lund())-400);
@@ -346,6 +348,8 @@ for(int j=0; j<lamc_p.size(); ++j){
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
 
+    if (ntr > 3) continue;
+
     t1->column("rm", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    
     t1->column("ntr", ntr);
@@ -365,6 +369,7 @@ for(int j=0; j<lamc_m.size(); ++j){
     for(int jj=0; jj<pi_p.size(); ++jj)if (!checkSame(pi_p[jj], x_c)) ntr++;
     for(int jj=0; jj<pi_m.size(); ++jj)if (!checkSame(pi_m[jj], x_c)) ntr++;
     
+    if (ntr > 3) continue;
 
     t1->column("rm", (beam - (x_c.p())).m());    
     t1->column("ecm", ecm);    
