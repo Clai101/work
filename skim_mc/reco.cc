@@ -825,7 +825,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     bool tr_m = true;
 
     if (prot.relation().genHepevt())
-      tr_lamc = true;
+      tr_p = true;
 
     if (lamc.relation().genHepevt())
       tr_lamc = true;
