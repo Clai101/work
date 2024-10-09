@@ -852,8 +852,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
     
     t1->column("chxc", chxc.channel().find("chanel")->second);
-    t1->column("cmxca", beam.vect().angle(x_c.vect()));
-    t1->column("ncmxca", beam.vect().angle(nx_c.vect()));
+    t1->column("cmxca", beam.vect().angle(x_c.p().vect()));
+    t1->column("ncmxca", beam.vect().angle(nx_c.p().vect()));
     t1->column("pxc", pStar(x_c, elec, posi).vect().mag());     
     t1->column("npxc", pStar(x_c, elec, posi).vect().mag());   
     t1->column("mxc", x_c.mass());
