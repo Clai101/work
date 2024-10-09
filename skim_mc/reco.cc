@@ -834,7 +834,14 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       tr_ach = true;
     }
 
-    if((chxc.channel().find("chanel")->second == 2) or (chxc.channel().find("chanel")->second == 4)) tr_m = x_c.child(2).relation().genHepevt();
+    if((chxc.channel().find("chanel")->second == 2) or (chxc.channel().find("chanel")->second == 4)) {
+      if(x_c.child(2).relation().genHepevt()){
+        bool tr_m = true;
+      }
+      else{
+        bool tr_m = false;
+      }
+      }
     
     t1->column("tr", tr_ach & tr_p & tr_m & tr_lamc);
 
