@@ -10,7 +10,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm p np ntr en_gam enc_gam count_gam chxc pxc tr_lamc tr_ach tr_p npxc mxc chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
+    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr_lamc tr_ach tr_p npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
     "en ecm p ntr chu chrgach chach mach rmlc");
@@ -520,8 +520,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setGenHepInfoF(mu_p);
   setGenHepInfoF(mu_m);
 
-  setGenHepInfoLambda(alam);
-  setGenHepInfoLambda(lam);
+  SetGenHepInfoALam(alam);
+  SetGenHepInfoLam(lam);
 
   //Lambdac  
 
@@ -696,9 +696,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   setGenHepInfoT(D_p_st);
   setGenHepInfoT(D_m_st);
 
-
-  cout << "3\n" ;
-
   for(std::vector<Particle>::iterator D = D0_st.begin(); D!=D0_st.end(); ++D) {
     if ((abs(D->child(0).mass() - D->child(0).pType().mass()) > 0.015) or (D->mass() - D->child(0).mass() > 0.155)) {
       D0_st.erase(D); --D;
@@ -761,8 +758,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
   for(int j=0; j<ups.size(); ++j){
     Particle u=ups[j];
 
-    cout << "5\n" ;
-
     short ntr=0;
     int count_gam=0;
     for(int jj=0; jj<pi_p.size(); ++jj) 
@@ -771,7 +766,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     for(int jj=0; jj<pi_m.size(); ++jj) 
     if (!checkSame(pi_m[jj],u)) ntr++;
 
-    cout << "5.1\n" ;
 
     float en_gam=0, enc_gam=0;
     for(int jj=0; jj<gamma.size(); ++jj){
@@ -791,8 +785,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     UserInfo chach = static_cast<UserInfo&>(ach.userInfo());
     UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
     
-    cout << "5.2\n" ;
-
     int chargU = 0;
 
     VectorL p_1, p_2, p_3;
@@ -818,20 +810,20 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       nx_c.append_daughter(par3);
     }
 
-    cout << "5.3\n" ;
-
     nu = Particle(lamc.p() + nx_c.p(),  m_ptypeUPS4);
     nu.append_daughter(lamc);
     nu.append_daughter(x_c);
       
-    cout << "5.4\n" ;
-
 
     if ((beam - (x_c.p())).m2() > 4*4 or (ntr >= 1)) continue;    
 
     bool tr_lamc = false;
     bool tr_ach = false;
     bool tr_p = false;
+    bool tr_m = true;
+
+    if (p.relation().genHepevt())
+      tr_lamc = true;
 
     if (lamc.relation().genHepevt())
       tr_lamc = true;
@@ -840,16 +832,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       tr_ach = true;
     }
 
-    if (x_c.child(1).relation().genHepevt()){
-      if (chxc.channel().find("chanel")->second <= 4)
-        tr_p = true;
-    }
+    if((chxc.channel().find("chanel")->second == 2) or (chxc.channel().find("chanel")->second == 4)) tr_m = x_c.child(2).relation().genHepevt();
     
-    cout << "5.5\n" ;
+    t1->column("tr", tr_ach & tr_p & tr_m & tr_lamc);
 
-    t1->column("tr_lamc", tr_lamc);
-    t1->column("tr_ach", tr_ach);
-    t1->column("tr_p", tr_p);
 
 
     t1->column("en", pStar(u, elec, posi).e());
@@ -857,6 +843,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t1->column("ecm", ecm);
     t1->column("p", pStar(u, elec, posi).vect().mag());
     t1->column("np", pStar(nu, elec, posi).vect().mag());
+    t1->column("pcm", beam.vect().mag());
     t1->column("ntr", ntr);
 
 
@@ -865,22 +852,21 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
     
     t1->column("chxc", chxc.channel().find("chanel")->second);
+    t1->column("cmxca", beam.vect().angle(x_c.vect()));
+    t1->column("ncmxca", beam.vect().angle(nx_c.vect()));
     t1->column("pxc", pStar(x_c, elec, posi).vect().mag());     
     t1->column("npxc", pStar(x_c, elec, posi).vect().mag());   
     t1->column("mxc", x_c.mass());
-
-    cout << "5.6\n" ;
+    t1->column("nmxc", nx_c.mass());
 
 
     t1->column("chach", chach.channel().find("chanel")->second);
     t1->column("mach", chach.vmass() - ach.pType().mass());
     t1->column("nmach", ach.p().m() - ach.pType().mass());
 
-    cout << "5.7\n" ;
     if (chxc.channel().find("chanel")->second >= 3)
       t1->column("machdt", static_cast<UserInfo&>(ach.child(0).userInfo()).vmass() - ach.child(0).pType().mass());
       
-    cout << "5.8\n" ;
 
     t1->column("chi", chi);
 
@@ -889,8 +875,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t1->column("nml", lamc.p().m() - lamc.pType().mass());
     t1->column("pl", pStar(lamc, elec, posi).vect().mag());
     t1->column("count_gam", count_gam);
-
-    cout << "6.1\n";
 
     if(chlc.channel().find("chanel")->second <= 3){
 

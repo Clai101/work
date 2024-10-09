@@ -20,4 +20,5 @@ fpda_pid.*
 *.d
 *.index
 wandb_venv/
+ach_ind/
 started.txt
