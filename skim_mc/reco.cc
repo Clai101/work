@@ -10,7 +10,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr_lamc tr_ach tr_p npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
+    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
     "en ecm p ntr chu chrgach chach mach rmlc");
@@ -817,7 +817,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     nu.append_daughter(x_c);
       
 
-    if ((beam - (x_c.p())).m2() > 4*4 or (ntr >= 1)) continue;    
+    if ((beam - (x_c.p())).m2() > 3.5*3.5 or (ntr >= 1)) continue;    
 
     bool tr_lamc = false;
     bool tr_ach = false;
@@ -841,10 +841,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
       else{
         bool tr_m = false;
       }
-      }
+    }
     
     t1->column("tr", tr_ach & tr_p & tr_m & tr_lamc);
-
 
 
     t1->column("en", pStar(u, elec, posi).e());
