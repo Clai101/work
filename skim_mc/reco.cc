@@ -779,6 +779,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     Particle lam = lamc.child(0);
     Particle x_c = u.child(1);
     Particle ach = x_c.child(0);
+    Particle prot = x_c.child(1);
+
 
     
     UserInfo chlc = static_cast<UserInfo&>(lamc.userInfo());
@@ -822,7 +824,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     bool tr_p = false;
     bool tr_m = true;
 
-    if (p.relation().genHepevt())
+    if (prot.relation().genHepevt())
       tr_lamc = true;
 
     if (lamc.relation().genHepevt())
