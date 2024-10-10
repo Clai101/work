@@ -339,9 +339,11 @@ setGenHepInfoTlost(Particle &p){
     if(mother->idhep() == p.pType().lund()) break;
   }
   if(mother->idhep() != p.pType().lund()) return;
+  cout << "Mutter\n";
   // Check for other children that have the same mother;
   for(int i=1; i<nchildren; ++i){
     const Gen_hepevt *tmp(&(p.child(i).genHepevt()));
+    cout << p.child(i).pType().lund()<< "\n";
     while(tmp->mother()){
       tmp = &tmp->mother();
       if(tmp == mother) break;
