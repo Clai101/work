@@ -351,10 +351,10 @@ setGenHepInfoTlost(Particle &p){
     if(tmp != mother) return;
   }
   cout << "Schwester\n";
-  UserInfo prtt = static_cast<UserInfo&>(p.userInfo());
-  auto channel_map = prtt.channel(); // Get a reference to the map
-  auto it = channel_map.find("tr_lc");
-  if (it != channel_map.end()) it->second = true;
+//  UserInfo prtt = static_cast<UserInfo&>(p.userInfo());
+//  auto channel_map = prtt.channel(); // Get a reference to the map
+//  auto it = channel_map.find("tr_lc");
+//  if (it != channel_map.end()) it->second = true;
   p.relation().genHepevt(*mother);
 }
 
