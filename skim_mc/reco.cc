@@ -351,6 +351,8 @@ setGenHepInfoTlost(Particle &p){
     if(tmp != mother) return;
   }
   cout << "Schwester\n";
+  UserInfo prtt = static_cast<UserInfo&>(p.userInfo());
+  prtt.channel().find("tr_lc")->second = true;
   p.relation().genHepevt(*mother);
 }
 
@@ -531,18 +533,18 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   combination(lamc_m, m_ptypeLAMC, alam, pi_m, 0.05);
   combination(lamc_p, m_ptypeLAMC, lam, pi_p, 0.05);
-  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}});
-  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}});
+  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}, , {"tr_lc": false}});
+  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}, , {"tr_lc": false}});
 
   combination(lamc_m, m_ptypeLAMC, alam, pi_m, pi0, 0.05);
   combination(lamc_p, m_ptypeLAMC, lam, pi_p, pi0, 0.05);
-  setUserInfo(lamc_m,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", 1}});
-  setUserInfo(lamc_p,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", -1}});
+  setUserInfo(lamc_m,  {{"chanel", 4}, {"charg", -1}, {"baryon_num", 1}, {"tr_lc": false}});
+  setUserInfo(lamc_p,  {{"chanel", 4}, {"charg", 1}, {"baryon_num", -1}, {"tr_lc": false}});
 
   combination(lamc_m, m_ptypeLAMC, ap, k_p, pi_m, 0.05);
   combination(lamc_p, m_ptypeLAMC, p, k_m, pi_p, 0.05);
-  setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}});
-  setUserInfo(lamc_p, {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}});
+  setUserInfo(lamc_m, {{"chanel", 5}, {"charg", -1}, {"baryon_num", -1}, {"tr_lc": false}});
+  setUserInfo(lamc_p, {{"chanel", 5}, {"charg", 1}, {"baryon_num", 1}, {"tr_lc": false}});
 
   doKvFit(lamc_m);
   doKvFit(lamc_p);
@@ -555,13 +557,13 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   combination(lamcl_p, m_ptypeLAMC, lam, e_p);
   combination(lamcl_m, m_ptypeLAMC, alam, e_m);
-  setUserInfo(lamcl_p,  {{"chanel", 1}, {"charg", 1}, {"baryon_num", -1}});
-  setUserInfo(lamcl_m,  {{"chanel", 1}, {"charg", -1}, {"baryon_num", 1}});
+  setUserInfo(lamcl_p,  {{"chanel", 1}, {"charg", 1}, {"baryon_num", -1}, {"tr_lc": false}});
+  setUserInfo(lamcl_m,  {{"chanel", 1}, {"charg", -1}, {"baryon_num", 1}, {"tr_lc": false}});
 
   combination(lamcl_p, m_ptypeLAMC, lam, mu_p);
   combination(lamcl_m, m_ptypeLAMC, alam, mu_m);
-  setUserInfo(lamcl_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}});
-  setUserInfo(lamcl_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}});
+  setUserInfo(lamcl_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}, , {"tr_lc": false}});
+  setUserInfo(lamcl_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}, , {"tr_lc": false}});
 
   doKvFit(lamcl_m, f);
   doKvFit(lamcl_p, f);
@@ -832,9 +834,12 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     if (lamc.relation().genHepevt())
       tr_lamc = true;
 
-    if (ach.relation().genHepevt()){
+    if (chlc.channel().find("tr_lc")->second)
+      tr_lamc = true;
+
+    if (ach.relation().genHepevt())
       tr_ach = true;
-    }
+    
 
     if((chxc.channel().find("chanel")->second == 2) or (chxc.channel().find("chanel")->second == 4)) {
       if(x_c.child(2).relation().genHepevt()){
@@ -924,7 +929,9 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     
     t1->column("rmnu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
     t1->column("nrmnu", (beam - (nx_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
+    t1->column("ID", int(evptr));
     
+
     t1->column("fox", r2);
 
 
@@ -934,7 +941,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
 
 
-if (*status==1) {nwritt++;
+if (*status==1) {nwritt++; event_num++;
+  
   cout << "Chac " << pi_p.size() << " " <<  pi_m.size() << " ntrack " << pi_p.size() + pi_m.size() << " ks_size " << k_s.size() << " lam size " << lam.size() + alam.size() <<endl;
 }
 cout << "7\n" ;
