@@ -352,7 +352,10 @@ setGenHepInfoTlost(Particle &p){
   }
   cout << "Schwester\n";
   UserInfo prtt = static_cast<UserInfo&>(p.userInfo());
-  prtt.channel().find("tr_lc")->second = true;
+  auto& channel_map = prtt.channel(); // Get a reference to the map
+  auto it = channel_map.find("tr_lc");
+  if (it != channel_map.end()) {
+    it->second = true;}
   p.relation().genHepevt(*mother);
 }
 
@@ -929,7 +932,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     
     t1->column("rmnu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
     t1->column("nrmnu", (beam - (nx_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
-    t1->column("ID", int(evptr));
+    t1->column("ID", reinterpret_cast<std::intptr_t>(evptr));
     
 
     t1->column("fox", r2);
@@ -941,7 +944,7 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
 
 
-if (*status==1) {nwritt++; event_num++;
+if (*status==1) {nwritt++;
   
   cout << "Chac " << pi_p.size() << " " <<  pi_m.size() << " ntrack " << pi_p.size() + pi_m.size() << " ks_size " << k_s.size() << " lam size " << lam.size() + alam.size() <<endl;
 }
