@@ -533,8 +533,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   combination(lamc_m, m_ptypeLAMC, alam, pi_m, 0.05);
   combination(lamc_p, m_ptypeLAMC, lam, pi_p, 0.05);
-  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}, , {"tr_lc": false}});
-  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}, , {"tr_lc": false}});
+  setUserInfo(lamc_m,  {{"chanel", 3}, {"charg", -1}, {"baryon_num", 1}, {"tr_lc": false}});
+  setUserInfo(lamc_p,  {{"chanel", 3}, {"charg", 1}, {"baryon_num", -1}, {"tr_lc": false}});
 
   combination(lamc_m, m_ptypeLAMC, alam, pi_m, pi0, 0.05);
   combination(lamc_p, m_ptypeLAMC, lam, pi_p, pi0, 0.05);
@@ -562,8 +562,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
   combination(lamcl_p, m_ptypeLAMC, lam, mu_p);
   combination(lamcl_m, m_ptypeLAMC, alam, mu_m);
-  setUserInfo(lamcl_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}, , {"tr_lc": false}});
-  setUserInfo(lamcl_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}, , {"tr_lc": false}});
+  setUserInfo(lamcl_p,  {{"chanel", 2}, {"charg", 1}, {"baryon_num", -1}, {"tr_lc": false}});
+  setUserInfo(lamcl_m,  {{"chanel", 2}, {"charg", -1}, {"baryon_num", 1}, {"tr_lc": false}});
 
   doKvFit(lamcl_m, f);
   doKvFit(lamcl_p, f);
