@@ -10,7 +10,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q");
+    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q ID");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
     "en ecm p ntr chu chrgach chach mach rmlc");
