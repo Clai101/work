@@ -887,8 +887,8 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t1->column("mach", chach.vmass() - ach.pType().mass());
     t1->column("nmach", ach.p().m() - ach.pType().mass());
 
-    t1->column("ppi", piom.vect().mag());
-    t1->column("mpi", piom.p().m() - piom.pType().mass());
+    t1->column("ppi", pion.vect().mag());
+    t1->column("mpi", pion.p().m() - piom.pType().mass());
 
 
     if (chxc.channel().find("chanel")->second >= 3)
