@@ -885,10 +885,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
     t1->column("chach", chach.channel().find("chanel")->second);
     t1->column("mach", chach.vmass() - ach.pType().mass());
-    t1->column("pach", chach.p().vect().mag());
+    t1->column("pach", ach.p().vect().mag());
     t1->column("nmach", ach.p().m() - ach.pType().mass());
 
-    t1->column("Dpia", chach.p().vect().angle(pion.p().vect()));
+    t1->column("Dpia", ach.p().vect().angle(pion.p().vect()));
 
     t1->column("ppi", pion.p().vect().mag());
     t1->column("mpi", pion.p().m() - pion.pType().mass());
@@ -944,7 +944,6 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     
     t1->column("rmnu", (beam - (x_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
     t1->column("nrmnu", (beam - (nx_c.p() + lamc.child(0).p() + lamc.child(1).p())).m2());
-    t1->column("ID", reinterpret_cast<std::intptr_t>(evptr));
     
 
     t1->column("fox", r2);
