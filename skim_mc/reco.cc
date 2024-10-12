@@ -10,7 +10,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q ID");
+    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc ppi mpi pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q ID fox");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
     "en ecm p ntr chu chrgach chach mach rmlc");
@@ -786,12 +786,18 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     Particle x_c = u.child(1);
     Particle ach = x_c.child(0);
     Particle prot = x_c.child(1);
-
+    Particle pion;
 
     
     UserInfo chlc = static_cast<UserInfo&>(lamc.userInfo());
     UserInfo chach = static_cast<UserInfo&>(ach.userInfo());
     UserInfo chxc = static_cast<UserInfo&>(x_c.userInfo());
+
+    if (chxc.channel().find("chanel")->second % 2 == 0)
+    pion = x_c.child(2);
+
+    if (chxc.channel().find("chanel")->second % 2 == 1)
+    pion = ach.child(1);
     
     int chargU = 0;
 
@@ -880,6 +886,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
     t1->column("chach", chach.channel().find("chanel")->second);
     t1->column("mach", chach.vmass() - ach.pType().mass());
     t1->column("nmach", ach.p().m() - ach.pType().mass());
+
+    t1->column("ppi", piom.vect().mag());
+    t1->column("mpi", piom.p().m() - piom.pType().mass());
+
 
     if (chxc.channel().find("chanel")->second >= 3)
       t1->column("machdt", static_cast<UserInfo&>(ach.child(0).userInfo()).vmass() - ach.child(0).pType().mass());
