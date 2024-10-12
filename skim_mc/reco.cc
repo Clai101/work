@@ -10,7 +10,7 @@ using namespace std;
 void User_reco::hist_def( void )
 { extern BelleTupleManager* BASF_Histogram;    
   t1 = BASF_Histogram->ntuple ("lmbda_lept",
-    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc ppi mpi pxc tr npxc nmxc mxc cmxca ncmxca chach mach nmach machdt chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q ID fox");
+    "en nen ecm pcm p np ntr en_gam enc_gam count_gam chxc ppi mpi pxc tr npxc nmxc mxc cmxca ncmxca chach pach mach nmach machdt Dpia chl ml pl ang_l_xc nang_l_xc ang_lc_l ang_l_p p_prot p_lam rmn nrmn rml nrml pn npn rmnu nrmnu fnrmnu chi q ID fox");
   /*
   t2 = BASF_Histogram->ntuple ("lmbdat",
     "en ecm p ntr chu chrgach chach mach rmlc");
@@ -885,7 +885,10 @@ void User_reco::event ( BelleEvent* evptr, int* status ) {
 
     t1->column("chach", chach.channel().find("chanel")->second);
     t1->column("mach", chach.vmass() - ach.pType().mass());
+    t1->column("pach", chach.p().vect().mag());
     t1->column("nmach", ach.p().m() - ach.pType().mass());
+
+    t1->column("Dpia", chach.p().vect().angle(pion.p().vect()));
 
     t1->column("ppi", pion.p().vect().mag());
     t1->column("mpi", pion.p().m() - pion.pType().mass());
